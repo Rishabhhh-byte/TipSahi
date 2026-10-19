@@ -1,0 +1,1770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>TipSahi — Verify. Understand. Decide.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<script>
+/* Resolve the theme before first paint so the app never flashes the wrong one.
+   Default preference is "system": follow the device light/dark setting. */
+(function(){var d=false;try{d=window.matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){}
+document.documentElement.setAttribute("data-theme",d?"dark":"light");document.documentElement.setAttribute("data-theme-pref","system");})();
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --forest:#123B2A; --green:#176B4D; --green-dark:#0F4A34; --green-hover:#0F4A34; --green-text:#176B4D; --mint:#B8E4C9; --mint-soft:#E4F3E9;
+  --bg:#F7F8F4; --card:#FFFFFF; --ink:#18231D; --ink2:#68746D; --line:#E3E8E2;
+  --amber:#B7791F; --amber-text:#B7791F; --amber-bg:#FBF3DF; --red:#C64747; --red-text:#C64747; --red-bg:#FBEAEA; --ok-bg:#E7F4EC;
+  --shadow:0 1px 2px rgba(18,59,42,.05),0 4px 16px rgba(18,59,42,.05); --shadow-pop:0 14px 40px rgba(18,59,42,.18);
+  --r:10px; --sidebar:#123B2A; --sidebar-ink:#DCEEE2; --sidebar-dim:#9DBFA9;
+  --chart-grid:#E3E8E2; --chart-fill:rgba(23,107,77,.10); --tip-bg:#123B2A; --focus:#176B4D;
+  --c-danger:#C64747; --c-warn:#B7791F; --c-ok:#176B4D; --c-neutral:#68746D;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --green-hover:#1E7D58; --green-text:#82D8AB; --mint-soft:#1E3326;
+  --bg:#0C120E; --card:#17211A; --ink:#EAF2EC; --ink2:#A4B7AA; --line:#29382E;
+  --amber-text:#E0AA4E; --amber-bg:#372E10; --red-text:#EE8B8B; --red-bg:#3A2120; --ok-bg:#1E3326;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 16px rgba(0,0,0,.3); --shadow-pop:0 14px 40px rgba(0,0,0,.55);
+  --sidebar:#0A140E;
+  --chart-grid:#29382E; --chart-fill:rgba(130,216,171,.13); --tip-bg:#264734; --focus:#82D8AB;
+  --c-danger:#E06565; --c-warn:#D9A441; --c-ok:#3FA97C; --c-neutral:#8FA398;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;line-height:1.2}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+a{color:var(--green-text)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ---------- Layout ---------- */
+.app{display:flex;min-height:100vh}
+.sidebar{width:248px;flex:0 0 248px;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:40;transition:margin-left .32s cubic-bezier(.22,.68,.32,1)}
+.sidebar.closed{margin-left:-248px;visibility:hidden;box-shadow:none;transition:margin-left .32s cubic-bezier(.22,.68,.32,1),visibility 0s linear .32s}
+.brand{padding:20px 20px 14px;display:flex;align-items:center;gap:11px}
+.brand-mark{width:38px;height:38px;border-radius:9px;background:var(--mint);color:var(--forest);display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:700;font-size:19px;flex:0 0 38px}
+.brand b{font-size:18px;letter-spacing:-.01em;color:#fff}
+.brand small{display:block;color:var(--sidebar-dim);font-size:11px;letter-spacing:.04em}
+.nav{padding:6px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:0;color:var(--sidebar-ink);padding:10px 12px;border-radius:8px;font-size:14px;font-weight:500;transition:background .15s ease,transform .12s ease}
+.nav button:active{transform:scale(.98)}
+.nav button svg{flex:0 0 18px;opacity:.85}
+.nav button:hover{background:rgba(255,255,255,.07)}
+.nav button.active{background:rgba(184,228,201,.16);color:#fff}
+.nav .nav-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sidebar-dim);padding:14px 12px 5px}
+.nav .nav-group-toggle{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sidebar-dim);font-weight:700;padding:10px 12px;margin-top:8px}
+.nav .nav-group-toggle:hover{color:#fff}
+.nav .nav-group-toggle .chev{margin-left:auto;flex:0 0 14px;opacity:.8;transition:transform .25s ease}
+.nav .nav-group.collapsed .nav-group-toggle .chev{transform:rotate(-90deg)}
+.nav .nav-group-items{display:flex;flex-direction:column;gap:2px;overflow:hidden;max-height:280px;transition:max-height .3s cubic-bezier(.22,.68,.32,1)}
+.nav .nav-group.collapsed .nav-group-items{max-height:0}
+.nav .nav-group-items button{padding-left:26px}
+.side-foot{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:var(--sidebar-dim)}
+.demo-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(183,121,31,.22);color:#F3D08A;border:1px solid rgba(243,208,138,.35);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar .crumb{font-size:12.5px;color:var(--ink2)}
+.topbar h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.searchbox{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;min-width:230px}
+.searchbox input{border:0;background:none;outline:none;width:100%;font-size:13.5px}
+.icon-btn{position:relative;background:var(--card);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:grid;place-items:center;color:var(--ink);transition:border-color .15s ease,transform .12s ease}
+.icon-btn:hover{border-color:var(--green)}
+.icon-btn:active{transform:scale(.93)}
+.icon-btn .dot{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--card)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;border:1px solid transparent;padding:9px 16px;font-weight:600;font-size:13.5px;text-decoration:none;transition:background .15s ease,border-color .15s ease,color .15s ease,transform .12s ease}
+.btn:not([disabled]):active{transform:translateY(1px) scale(.99)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green-hover)}
+.btn-ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green-text)}
+.btn-danger{background:var(--card);border-color:var(--line);color:var(--red-text)}
+.btn-sm{padding:6px 11px;font-size:12.5px}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--forest);color:var(--mint);display:grid;place-items:center;font-weight:700;font-size:13px;border:0}
+.content{padding:24px;max-width:1240px;width:100%;margin:0 auto}
+.page{display:none}
+.page.active{display:block;animation:fade .26s cubic-bezier(.22,.68,.32,1)}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes riseIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes barGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pop-in{animation:riseIn .32s cubic-bezier(.22,.68,.32,1) both}
+
+/* ---------- Components ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.card h3{font-size:15px;font-weight:700}
+.card .sub{color:var(--ink2);font-size:12.5px;margin-top:2px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(6,1fr)}
+.kpi .k-label{font-size:12px;color:var(--ink2);font-weight:600;letter-spacing:.02em}
+.kpi .k-value{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:5px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .k-note{font-size:12px;color:var(--ink2)}
+.kpi .k-note.warn{color:var(--amber-text);font-weight:600}
+.kpi .k-note.bad{color:var(--red-text);font-weight:600}
+.cols-2{grid-template-columns:1.9fr 1fr}
+.cols-eq{grid-template-columns:1fr 1fr}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:26px 0 14px;flex-wrap:wrap}
+.section-head h2{font-size:17px;font-weight:700}
+.section-head p{color:var(--ink2);font-size:13px;margin:3px 0 0}
+.tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;letter-spacing:.01em}
+.tag-high{background:var(--red-bg);color:var(--red-text)}
+.tag-susp{background:var(--amber-bg);color:var(--amber-text)}
+.tag-low,.tag-ok{background:var(--ok-bg);color:var(--green-text)}
+.tag-info{background:var(--mint-soft);color:var(--green-dark)}
+:root[data-theme="dark"] .tag-info{color:var(--mint)}
+.tag-demo{background:var(--amber-bg);color:var(--amber-text)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer;transition:background .15s ease}
+tbody tr:hover{background:var(--mint-soft)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.table-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.table-tools input,.table-tools select{border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--card);font-size:13px}
+.pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;font-size:12.5px;color:var(--ink2)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--card);font-size:14px;transition:border-color .15s ease}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green)}
+.field textarea{min-height:110px;resize:vertical}
+.field .hint{font-size:12px;color:var(--ink2);margin-top:4px}
+.field .err{font-size:12px;color:var(--red-text);margin-top:4px;display:none}
+.form-2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.stat-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.stat-row:last-child{border-bottom:0}
+.stat-row b{font-variant-numeric:tabular-nums;text-align:right}
+.list-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.list-item:last-child{border-bottom:0}
+.list-item .grow{flex:1;min-width:0}
+.list-item .t{font-weight:600;font-size:13.5px}
+.list-item .d{font-size:12.5px;color:var(--ink2)}
+.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.quick button{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px;text-align:left;box-shadow:var(--shadow);transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.quick button:hover{border-color:var(--green);transform:translateY(-2px)}
+.quick button:active{transform:translateY(0) scale(.99)}
+.quick b{display:block;font-size:14px;margin:8px 0 3px}
+.quick span{font-size:12px;color:var(--ink2);line-height:1.4;display:block}
+.quick .q-ic{width:34px;height:34px;border-radius:8px;background:var(--mint-soft);color:var(--green);display:grid;place-items:center}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tool-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;text-align:left;display:flex;flex-direction:column;width:100%;color:var(--ink);transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.tool-card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:0 8px 22px rgba(18,59,42,.10)}
+:root[data-theme="dark"] .tool-card:hover{box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.tool-card:active{transform:translateY(0) scale(.995)}
+.tool-card .t-ic{width:40px;height:40px;border-radius:9px;background:var(--mint-soft);color:var(--green);display:grid;place-items:center;margin-bottom:12px}
+.tool-card .t-sub{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--green)}
+.tool-card .t-name{font-size:16px;font-weight:700;margin-top:3px;line-height:1.25}
+.tool-card .t-desc{font-size:13px;color:var(--ink2);line-height:1.5;margin:7px 0 16px}
+.tool-card .t-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.tool-card .t-stat{font-size:12px;color:var(--ink2)}
+.tool-card .t-act{font-size:13px;font-weight:700;color:var(--green);white-space:nowrap}
+:root[data-theme="dark"] .tool-card .t-sub,:root[data-theme="dark"] .tool-card .t-act{color:var(--mint)}
+:root[data-theme="dark"] .q-ic,:root[data-theme="dark"] .t-ic{color:var(--mint)}
+@media (max-width:1180px){.tools{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.tools{grid-template-columns:1fr}}
+.paisapause{border:1px solid var(--green);border-left:5px solid var(--green);background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.paisapause h3{display:flex;align-items:center;gap:9px;font-size:15px}
+.paisapause h3 .pp-mark{width:26px;height:26px;border-radius:7px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800}
+.pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;margin-top:10px}
+.pp-grid h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:12px 0 4px}
+.pp-grid ul{margin:0;padding-left:17px;font-size:13px}
+.pp-grid li{margin:3px 0}
+.notice{border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:14px}
+.notice-amber{background:var(--amber-bg);border:1px solid var(--amber);color:var(--ink)}
+.notice-red{background:var(--red-bg);border:1px solid var(--red);color:var(--ink)}
+.notice-green{background:var(--ok-bg);border:1px solid var(--green);color:var(--ink)}
+.upload{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--ink2);font-size:13px;background:var(--bg);transition:border-color .15s ease,background .15s ease}
+.upload.drag{border-color:var(--green);background:var(--mint-soft)}
+.modal-back{position:fixed;inset:0;background:rgba(10,25,17,.55);display:none;place-items:center;z-index:80;padding:16px}
+.modal-back.open{display:grid;animation:fadeIn .18s ease both}
+.modal-back.open .modal{animation:popIn .24s cubic-bezier(.22,.68,.32,1) both}
+.modal{background:var(--card);border-radius:12px;max-width:520px;width:100%;padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.3);max-height:88vh;overflow-y:auto}
+.modal h3{font-size:17px;margin-bottom:8px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--tip-bg);color:#fff;padding:12px 18px;border-radius:9px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:100;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chart-wrap{position:relative}
+.chart-tip{position:absolute;pointer-events:none;background:var(--tip-bg);color:#fff;font-size:12px;border-radius:6px;padding:6px 9px;opacity:0;transition:opacity .12s;white-space:nowrap;z-index:5}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:8px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+.toggle-row:last-child{border-bottom:0}
+.toggle-row .d{font-size:12.5px;color:var(--ink2)}
+.switch{position:relative;width:44px;height:24px;flex:0 0 44px}
+.switch input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer}
+.switch .tr{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:.15s;pointer-events:none}
+.switch .tr::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked + .tr{background:var(--green)}
+.switch input:checked + .tr::after{left:23px}
+.switch input:focus-visible + .tr{outline:2px solid var(--focus);outline-offset:2px}
+.scenario-win{border-color:var(--green)!important;background:var(--mint-soft)}
+.empty{padding:28px;text-align:center;color:var(--ink2);font-size:13.5px}
+.pop{position:absolute;right:0;top:48px;width:320px;max-width:88vw;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-pop);padding:8px;display:none;z-index:60}
+.pop.open{display:block;animation:popIn .18s cubic-bezier(.22,.68,.32,1) both;transform-origin:top right}
+.pop .n-item{padding:10px;border-radius:7px;font-size:13px}
+.pop .n-item:hover{background:var(--mint-soft)}
+/* ---------- Theme menu ---------- */
+#themeBtn .ic-moon{display:none}
+:root[data-theme="dark"] #themeBtn .ic-moon{display:block}
+:root[data-theme="dark"] #themeBtn .ic-sun{display:none}
+.theme-opt{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;text-align:left;padding:9px 10px;border-radius:7px;font-size:13px;color:var(--ink)}
+.theme-opt:hover{background:var(--mint-soft)}
+.theme-opt svg{flex:0 0 16px;color:var(--ink2)}
+.theme-opt .t-name{font-weight:600;display:block;line-height:1.3}
+.theme-opt .t-d{display:block;font-size:11.5px;color:var(--ink2);line-height:1.35}
+.theme-opt .ck{margin-left:auto;color:var(--green-text);font-weight:800;visibility:hidden;flex:0 0 auto}
+.theme-opt[aria-checked="true"] .ck{visibility:visible}
+.rel{position:relative}
+.mnav{display:none}
+footer.foot{padding:18px 24px 30px;color:var(--ink2);font-size:12px;text-align:center}
+
+/* ---------- Dashboard interactivity ---------- */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rangebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 20px}
+.rangebar .rb-label{font-size:13px;font-weight:700}
+.rangebar .rb-group{display:flex;gap:6px;flex-wrap:wrap}
+.range-preset.active{background:var(--green);color:#fff;border-color:var(--green)}
+.rangebar input[type="date"]{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--card);font-size:13px;color:var(--ink)}
+.rangebar input[aria-invalid="true"]{border-color:var(--red)}
+.rangebar .rb-status{font-size:12.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:7px}
+.rangebar .rb-err{font-size:12.5px;color:var(--red-text);font-weight:600;width:100%}
+.spinner.dark{border-color:var(--line);border-top-color:var(--green-text)}
+.kpi .k-label,.kpi .k-value,.kpi .k-note{display:block}
+button.kpi{text-align:left;width:100%;color:var(--ink);transition:border-color .18s ease,transform .18s ease}
+button.kpi:hover{border-color:var(--green);transform:translateY(-1px)}
+button.kpi:active{transform:translateY(0) scale(.995)}
+.outcome-btn{display:block;width:100%;background:none;border:0;padding:0;text-align:left;color:var(--ink);margin-bottom:11px}
+.outcome-btn:hover .ob-name{color:var(--green-text);text-decoration:underline}
+.outcome-btn .ob-track{display:block;background:var(--line);border-radius:5px;height:10px;margin-top:4px}
+.outcome-btn .ob-fill{display:block;height:10px;border-radius:5px;transform-origin:left center;animation:barGrow .55s cubic-bezier(.22,.68,.32,1) both}
+.att-btn{display:flex;gap:12px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;align-items:flex-start;color:var(--ink);border-radius:6px;transition:background .15s ease}
+.att-btn:hover{background:var(--mint-soft)}
+.att-btn:last-of-type{border-bottom:0}
+.att-btn:hover .t{color:var(--green-text)}
+tbody tr:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+#loanActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+#loanActions[hidden]{display:none}
+#txnDelete[hidden]{display:none}
+
+/* ---------- Motion: staggered dashboard entrances ----------
+   The .fresh class is added by go() (and once at boot) for ~1s, so cards
+   rise in with a short stagger when a page is entered — data refreshes
+   while staying on the page do not replay it. The global
+   prefers-reduced-motion rule above disables all of this. */
+#page-overview.fresh #kpiGrid>*,#page-overview.fresh #quickGrid>*,#page-overview.fresh #toolsGrid>*{animation:riseIn .4s cubic-bezier(.22,.68,.32,1) both}
+#page-overview.fresh #kpiGrid>*:nth-child(2){animation-delay:.05s}
+#page-overview.fresh #kpiGrid>*:nth-child(3){animation-delay:.1s}
+#page-overview.fresh #kpiGrid>*:nth-child(4){animation-delay:.15s}
+#page-overview.fresh #kpiGrid>*:nth-child(5){animation-delay:.2s}
+#page-overview.fresh #kpiGrid>*:nth-child(6){animation-delay:.25s}
+#page-overview.fresh #quickGrid>*{animation-delay:.1s}
+#page-overview.fresh #quickGrid>*:nth-child(2){animation-delay:.15s}
+#page-overview.fresh #quickGrid>*:nth-child(3){animation-delay:.2s}
+#page-overview.fresh #quickGrid>*:nth-child(4){animation-delay:.25s}
+#page-overview.fresh #quickGrid>*:nth-child(5){animation-delay:.3s}
+#page-overview.fresh #toolsGrid>*{animation-delay:.16s}
+#page-overview.fresh #toolsGrid>*:nth-child(2){animation-delay:.22s}
+#page-overview.fresh #toolsGrid>*:nth-child(3){animation-delay:.28s}
+#page-overview.fresh #toolsGrid>*:nth-child(4){animation-delay:.34s}
+#page-overview.fresh #toolsGrid>*:nth-child(5){animation-delay:.4s}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1180px){.kpis{grid-template-columns:repeat(3,1fr)}.quick{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:900px){
+  .cols-2,.cols-eq{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;box-shadow:0 0 60px rgba(0,0,0,.35)}
+  .sidebar.closed{display:none}
+  .content{padding:16px 14px 84px}
+  .topbar{padding:10px 14px}
+  .searchbox{min-width:0;flex:1 1 100%;order:3;margin-top:2px}
+  .mnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);z-index:50;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .mnav button{flex:1;background:none;border:0;color:var(--ink2);font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px}
+  .mnav button.active{color:var(--green-text)}
+  .form-2{grid-template-columns:1fr}
+  .pp-grid{grid-template-columns:1fr}
+}
+.kpis.pocket-kpis{grid-template-columns:repeat(4,1fr)}
+@media (max-width:900px){.kpis.pocket-kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .quick{grid-template-columns:repeat(2,1fr)}
+  .top-actions .btn span{display:none}
+  table.resp thead{display:none}
+  table.resp tr{display:block;padding:8px 0;border-bottom:1px solid var(--line)}
+  table.resp td{display:flex;justify-content:space-between;gap:14px;border-bottom:0;padding:5px 10px}
+  table.resp td::before{content:attr(data-l);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:700}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div><b>TipSahi</b><small>VERIFY · UNDERSTAND · DECIDE</small></div>
+    </div>
+    <nav class="nav" id="mainNav">
+      <div class="nav-label">Workspace</div>
+      <button data-page="overview" class="active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Overview</button>
+      <div class="nav-group" id="ftGroup">
+        <button class="nav-group-toggle" id="ftToggle" aria-expanded="true" aria-controls="ftItems">Financial Tools<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="nav-group-items" id="ftItems">
+          <button data-page="paysahi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>PaySahi</button>
+          <button data-page="verify"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11l2 2 4-4"/></svg>TipSahi Verify</button>
+          <button data-page="loanlens"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>LoanLens</button>
+          <button data-page="pocketrunway"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 3 6-8"/><path d="M3 21h18"/></svg>PocketRunway</button>
+          <button data-page="investlab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>InvestLab</button>
+        </div>
+      </div>
+      <div class="nav-label">Records</div>
+      <button data-page="history"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 7v5l3 3"/></svg>Activity History</button>
+      <button data-page="reports"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>Reports</button>
+      <button data-page="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>Settings</button>
+    </nav>
+    <div class="side-foot">
+      <span class="demo-chip">● DEMO MODE</span>
+      <p style="margin:10px 0 0">Sample data only. Live AI &amp; exchange feeds are not connected in this demo build.</p>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="Toggle sidebar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div>
+        <div class="crumb" id="crumb">TipSahi / Overview</div>
+        <h1 id="pageTitle">Overview</h1>
+      </div>
+      <div class="searchbox">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="globalSearch" type="search" placeholder="Search analyses, reports, tools…" aria-label="Global search">
+      </div>
+      <div class="rel top-actions" style="display:flex;gap:8px;align-items:center">
+        <div class="rel">
+          <button class="icon-btn" id="themeBtn" aria-label="Theme: System" aria-haspopup="menu" aria-expanded="false"><svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ic-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg></button>
+          <div class="pop" id="themePop" role="menu" aria-label="Appearance theme" style="width:252px">
+            <div style="padding:8px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink2)">APPEARANCE</div>
+            <button class="theme-opt" data-theme-choice="light" role="menuitemradio" aria-checked="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span><span class="t-name">Light</span><span class="t-d">Warm off-white, forest-green accents</span></span><span class="ck" aria-hidden="true">✓</span></button>
+            <button class="theme-opt" data-theme-choice="dark" role="menuitemradio" aria-checked="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg><span><span class="t-name">Dark</span><span class="t-d">Deep charcoal-forest, easy on the eyes</span></span><span class="ck" aria-hidden="true">✓</span></button>
+            <button class="theme-opt" data-theme-choice="system" role="menuitemradio" aria-checked="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span><span class="t-name">System</span><span class="t-d">Follow your device setting</span></span><span class="ck" aria-hidden="true">✓</span></button>
+          </div>
+        </div>
+        <button class="icon-btn" id="notifBtn" aria-label="Notifications"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8M10 21a2 2 0 0 0 4 0"/></svg><span class="dot"></span></button>
+        <div class="pop" id="notifPop" role="menu" aria-label="Notifications">
+          <div class="n-item"><b>High-risk message flagged</b><br><span style="color:var(--ink2);font-size:12px">PaySahi · KYC message from “SBI-UPDATE” — 2h ago · Demo</span></div>
+          <div class="n-item"><b>EMI due in 3 days</b><br><span style="color:var(--ink2);font-size:12px">PocketRunway · Personal loan EMI ₹18,432 on 21 Oct</span></div>
+          <div class="n-item"><b>Reserve warning</b><br><span style="color:var(--ink2);font-size:12px">Projected balance dips below your ₹25,000 reserve on 29 Oct if the festival expense is added.</span></div>
+        </div>
+        <button class="btn btn-primary" id="newAnalysisBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span>New Analysis</span></button>
+        <div class="rel">
+          <button class="avatar" id="profileBtn" aria-label="Profile menu">AR</button>
+          <div class="pop" id="profilePop" style="width:230px">
+            <div class="n-item"><b>Demo User</b><br><span style="color:var(--ink2);font-size:12px">demo@tipsahi.example</span></div>
+            <div class="n-item" data-goto="settings" style="cursor:pointer">Account settings</div>
+            <div class="n-item" data-goto="reports" style="cursor:pointer">My reports</div>
+            <div class="n-item" id="signOutItem" style="cursor:pointer;color:var(--red-text)">Sign out (demo)</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content" id="contentRoot">
+
+    <!-- ================= OVERVIEW ================= -->
+    <section class="page active" id="page-overview">
+      <div class="notice notice-amber" role="note"><b>Demo workspace.</b> All figures below come from one shared sample dataset (a salaried household in Pune, Oct 2026) so every tool agrees with every other. Nothing here is live or verified against real accounts.</div>
+
+      <div class="card rangebar" style="margin-bottom:16px" role="group" aria-label="Dashboard date range">
+        <span class="rb-label">Dashboard range</span>
+        <div class="rb-group" role="group" aria-label="Preset ranges">
+          <button class="btn btn-ghost btn-sm range-preset" data-days="7">Last 7 days</button>
+          <button class="btn btn-ghost btn-sm range-preset active" data-days="30">Last 30 days</button>
+          <button class="btn btn-ghost btn-sm range-preset" data-days="60">Last 60 days</button>
+          <button class="btn btn-ghost btn-sm range-preset" data-days="90">Last 90 days</button>
+          <button class="btn btn-ghost btn-sm range-preset" data-days="all">All time</button>
+        </div>
+        <span style="font-size:12.5px;color:var(--ink2)">or custom:</span>
+        <label class="sr-only" for="rangeFrom">Range start date</label><input type="date" id="rangeFrom" value="2026-10-01" min="2026-01-01" max="2027-12-31">
+        <label class="sr-only" for="rangeTo">Range end date</label><input type="date" id="rangeTo" value="2026-10-18" min="2026-01-01" max="2027-12-31">
+        <button class="btn btn-ghost btn-sm" id="rangeApply">Apply range</button>
+        <span class="rb-status" id="rangeStatus" role="status">Filters checks, outcomes &amp; activity · forecast looks the same span ahead</span>
+        <span class="rb-err" id="rangeErr" role="alert" hidden></span>
+      </div>
+
+      <div class="grid kpis" id="kpiGrid"></div>
+
+      <div class="section-head" style="margin-top:22px"><div><h2>Quick actions</h2><p>Jump straight into a task — each opens its tool with the first field ready.</p></div></div>
+      <div class="quick" id="quickGrid">
+        <button data-quick="paysahi" data-focus="payText"><span class="q-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><b>Check a message</b><span>Paste a suspicious SMS or WhatsApp forward into PaySahi.</span></button>
+        <button data-quick="verify" data-focus="verTicker"><span class="q-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11l2 2 4-4"/></svg></span><b>Verify a claim</b><span>Fact-check a forwarded stock tip in TipSahi Verify.</span></button>
+        <button data-quick="loanlens" data-focus="loanAmt"><span class="q-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><b>Calculate a loan</b><span>EMI, fees and true borrowing cost in LoanLens.</span></button>
+        <button data-quick="pocket"><span class="q-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span><b>Update forecast</b><span>Add income, a bill or an EMI — PocketRunway recalculates instantly.</span></button>
+        <button data-quick="investlab" data-focus="invPrice"><span class="q-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg></span><b>Compare scenarios</b><span>Buy now vs save first, side by side in InvestLab.</span></button>
+      </div>
+
+      <div class="section-head"><div><h2>Financial Tools</h2><p>Explore the five features — each opens as a focused workspace right here, and its results flow back to this dashboard.</p></div></div>
+      <div class="tools" id="toolsGrid"></div>
+
+      <div class="grid cols-2" style="margin-top:16px">
+        <div class="card">
+          <h3 id="ovChartTitle">Cash-flow forecast — next 30 days</h3>
+          <div class="sub" id="ovChartSub">Projected daily balance from PocketRunway · Dashed line = your ₹25,000 minimum reserve · <span class="tag tag-demo">DEMO DATA</span></div>
+          <div class="chart-wrap" style="margin-top:12px"><div id="overviewChart"></div><div class="chart-tip" id="overviewTip"></div></div>
+          <div class="legend"><span><i style="background:var(--green-text)"></i>Projected balance</span><span><i style="background:var(--amber)"></i>Minimum reserve</span></div>
+        </div>
+        <div class="card">
+          <h3>Analysis outcomes</h3>
+          <div class="sub">Checks in the selected range, by verdict · select a bar to filter Recent activity</div>
+          <div id="outcomeChart" style="margin-top:14px"></div>
+          <div class="legend" id="outcomeLegend"></div>
+        </div>
+      </div>
+
+      <div class="grid cols-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Needs your attention</h3>
+          <div class="sub">Recent analyses with risk or shortfall signals</div>
+          <div id="attentionList"></div>
+        </div>
+        <div class="card">
+          <h3>Upcoming commitments</h3>
+          <div class="sub">From PocketRunway &amp; LoanLens · within the selected range</div>
+          <div id="commitList"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px" id="actCard">
+        <h3>Recent activity</h3>
+        <div class="sub">Search, filter, sort and page through analyses in the selected range. Select a row — or focus it and press Enter — to open its detail view.</div>
+        <div class="table-tools" style="margin-top:12px">
+          <input type="search" id="actSearch" placeholder="Search activity…" aria-label="Search activity">
+          <select id="actModule" aria-label="Filter by tool"><option value="">All tools</option><option>PaySahi</option><option>TipSahi Verify</option><option>LoanLens</option><option>PocketRunway</option><option>InvestLab</option></select>
+          <select id="actSort" aria-label="Sort activity"><option value="date-desc">Newest first</option><option value="date-asc">Oldest first</option><option value="title">Title A–Z</option></select>
+          <select id="actOutcome" aria-label="Filter activity by outcome"><option value="">All outcomes</option><option>High Risk</option><option>Contradicted</option><option>Suspicious Indicators</option><option>Insufficient Evidence</option><option>Calculated</option><option>Forecast</option><option>Simulated</option></select>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="resp" aria-label="Recent activity">
+          <thead><tr><th>Analysis</th><th>Tool</th><th>Date</th><th>Outcome</th><th class="num">Amount</th></tr></thead>
+          <tbody id="actBody"></tbody>
+        </table>
+        </div>
+        <div class="pager"><span id="actPageInfo"></span><button class="btn btn-ghost btn-sm" id="actPrev">Previous</button><button class="btn btn-ghost btn-sm" id="actNext">Next</button></div>
+      </div>
+    </section>
+
+    <!-- ================= PAYSAHI ================= -->
+    <section class="page" id="page-paysahi">
+      <div class="section-head" style="margin-top:0"><div><button class="btn btn-ghost btn-sm" data-goto="overview" style="margin-bottom:10px">← All Financial Tools</button><h2>PaySahi — UPI Scam Shield</h2><p>Paste a suspicious bank, KYC or payment message. PaySahi checks it for known scam patterns — it never asks for your UPI PIN, OTP or password, and it cannot block payments.</p></div><span class="tag tag-demo">DEMO ANALYSER</span></div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Message to check</h3>
+          <div class="field" style="margin-top:12px"><label for="payText">Suspicious message text</label>
+            <textarea id="payText" placeholder="Paste the SMS / WhatsApp message here…">Dear customer, your SBI account will be BLOCKED today due to incomplete KYC. Verify immediately at http://sbi-kyc-update.xyz/verify and share the OTP sent to your mobile to avoid closure. - SBI Team</textarea>
+            <div class="hint">Tip: try the sample, or write your own — the analyser looks for urgency, credential requests, look-alike links and reward lures.</div>
+          </div>
+          <div class="upload" id="payUpload" tabindex="0" role="button" aria-label="Upload screenshot">
+            <b>Attach a screenshot (optional)</b><br>JPG or PNG, up to 5 MB. In demo mode the file name is recorded; image text is not read.
+            <input type="file" id="payFile" accept="image/png,image/jpeg" hidden>
+            <div id="payFileName" style="margin-top:6px;font-weight:600;color:var(--green-text)"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="payAnalyse">Analyse message</button>
+            <button class="btn btn-ghost" id="paySample2">Load a “prize” sample</button>
+            <button class="btn btn-ghost" id="payClear">Clear</button>
+          </div>
+          <div class="notice notice-amber" style="margin-top:16px;margin-bottom:0"><b>Stay safe:</b> Banks and the RBI never ask for OTPs, PINs or passwords by message, and never ask you to install apps or click links to “unblock” an account.</div>
+        </div>
+        <div>
+          <div class="card" id="payResultCard">
+            <h3>Assessment</h3>
+            <div id="payResult"><div class="empty">No analysis yet. Paste a message and choose <b>Analyse message</b>.</div></div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h3>Verify through official channels</h3>
+            <div class="list-item"><div class="grow"><div class="t">National Cyber Crime Portal</div><div class="d">Report fraud and check guidance — cybercrime.gov.in · Helpline 1930</div></div><a class="btn btn-ghost btn-sm" href="https://cybercrime.gov.in" target="_blank" rel="noopener">Open</a></div>
+            <div class="list-item"><div class="grow"><div class="t">RBI — Be(A)ware</div><div class="d">Official awareness on banking frauds — rbi.org.in</div></div><a class="btn btn-ghost btn-sm" href="https://www.rbi.org.in" target="_blank" rel="noopener">Open</a></div>
+            <div class="list-item"><div class="grow"><div class="t">Your bank’s official app / branch</div><div class="d">Always verify account status inside the bank’s own app or by calling the number on your debit card — never a number inside the message.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="payPaisa" style="margin-top:16px"></div>
+      <div class="card" style="margin-top:16px">
+        <h3>PaySahi history</h3><div class="sub">This session’s checks, newest first</div>
+        <div id="payHistory" style="margin-top:8px"></div>
+      </div>
+    </section>
+
+    <!-- ================= VERIFY ================= -->
+    <section class="page" id="page-verify">
+      <div class="section-head" style="margin-top:0"><div><button class="btn btn-ghost btn-sm" data-goto="overview" style="margin-bottom:10px">← All Financial Tools</button><h2>TipSahi Verify — Stock-Tip Fact Checker</h2><p>Test a circulating tip or claim. Verdicts are evidence-based; in demo mode live exchange filings cannot be fetched, so anything that needs a filing is honestly marked <b>Insufficient Evidence</b>.</p></div><span class="tag tag-demo">DEMO · NO LIVE FEED</span></div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Claim to verify</h3>
+          <div class="field" style="margin-top:12px"><label for="verTicker">Stock ticker or company name</label><input id="verTicker" value="RELIANCE" placeholder="e.g. RELIANCE, TCS, HDFCBANK"><div class="err" id="verTickerErr">Enter a ticker or company name.</div></div>
+          <div class="field"><label for="verClaim">The claim, exactly as received</label><textarea id="verClaim">Forwarded tip: Reliance will definitely double in 3 months — guaranteed multibagger, insider news of a huge order. Buy now before the announcement!!</textarea><div class="err" id="verClaimErr">Paste the claim text to analyse.</div></div>
+          <div class="upload" id="verUpload" tabindex="0" role="button" aria-label="Upload tip screenshot"><b>Attach tip screenshot (optional)</b><br>JPG or PNG, up to 5 MB · recorded in demo mode<input type="file" id="verFile" accept="image/png,image/jpeg" hidden><div id="verFileName" style="margin-top:6px;font-weight:600;color:var(--green-text)"></div></div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="verAnalyse">Analyse claim</button><button class="btn btn-ghost" id="verSample2">Load a results claim</button></div>
+          <div class="notice notice-amber" style="margin-top:16px;margin-bottom:0"><b>No tips, ever:</b> TipSahi Verify checks claims — it never issues buy/sell calls, target prices or return promises.</div>
+        </div>
+        <div class="card" id="verResultCard">
+          <h3>Verdict</h3>
+          <div id="verResult"><div class="empty">No verdict yet. Enter a claim and choose <b>Analyse claim</b>.</div></div>
+        </div>
+      </div>
+      <div id="verPaisa" style="margin-top:16px"></div>
+      <div class="card" style="margin-top:16px"><h3>Verify history</h3><div class="sub">This session’s checks</div><div id="verHistory" style="margin-top:8px"></div></div>
+    </section>
+
+    <!-- ================= LOANLENS ================= -->
+    <section class="page" id="page-loanlens">
+      <div class="section-head" style="margin-top:0"><div><button class="btn btn-ghost btn-sm" data-goto="overview" style="margin-bottom:10px">← All Financial Tools</button><h2>LoanLens — Loan Cost Analysis</h2><p>Exact, deterministic EMI maths — no AI guessing. Compare offers, see total cost, then send the EMI to PocketRunway with one confirmation.</p></div></div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Loan details</h3>
+          <form id="loanForm" novalidate style="margin-top:12px">
+            <div class="form-2">
+              <div class="field"><label for="loanName">Offer name</label><input id="loanName" value="Bank A — Personal Loan"></div>
+              <div class="field"><label for="loanStart">Loan start date</label><input id="loanStart" type="date" value="2026-11-01"></div>
+              <div class="field"><label for="loanAmt">Loan amount (₹)</label><input id="loanAmt" type="number" min="1000" step="500" value="500000"><div class="err" id="e-loanAmt">Enter an amount of at least ₹1,000.</div></div>
+              <div class="field"><label for="loanRate">Annual interest rate (%)</label><input id="loanRate" type="number" min="0.1" max="40" step="0.05" value="11.5"><div class="err" id="e-loanRate">Enter a rate between 0.1% and 40%.</div></div>
+              <div class="field"><label for="loanTenure">Tenure (months)</label><input id="loanTenure" type="number" min="1" max="360" step="1" value="36"><div class="err" id="e-loanTenure">Enter 1–360 months.</div></div>
+              <div class="field"><label for="loanDown">Down payment (₹, if any)</label><input id="loanDown" type="number" min="0" step="500" value="0"></div>
+              <div class="field"><label for="loanFeePct">Processing fee (% of loan)</label><input id="loanFeePct" type="number" min="0" max="10" step="0.1" value="1"></div>
+              <div class="field"><label for="loanCharges">Other charges (₹)</label><input id="loanCharges" type="number" min="0" step="100" value="2500"></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="submit" class="btn btn-primary">Calculate true cost</button>
+              <button type="button" class="btn btn-ghost" id="loanAddCompare">Add to comparison</button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <div class="card" id="loanResultCard">
+            <h3>True cost breakdown</h3>
+            <div id="loanResult"><div class="empty">Calculate to see EMI, total interest and fees.</div></div>
+            <div id="loanBreakChart" style="margin-top:10px"></div>
+            <div id="loanActions" hidden>
+              <button class="btn btn-primary" id="loanToPocket">Send EMI to PocketRunway</button>
+              <button class="btn btn-ghost" id="loanAmortToggle">View amortisation schedule</button>
+              <button class="btn btn-ghost" id="loanExport">Export schedule (CSV)</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px" id="amortCard" hidden>
+            <h3>Amortisation schedule</h3><div class="sub">First 12 months shown; CSV export contains all months</div>
+            <div style="overflow-x:auto;margin-top:8px"><table aria-label="Amortisation schedule"><thead><tr><th>Month</th><th class="num">EMI</th><th class="num">Principal</th><th class="num">Interest</th><th class="num">Balance</th></tr></thead><tbody id="amortBody"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Offer comparison</h3><div class="sub">Same assumptions, side by side. The lowest total cost is highlighted — always read the fee lines, not just the EMI.</div>
+        <div style="overflow-x:auto;margin-top:10px"><table class="resp" aria-label="Loan offer comparison"><thead><tr><th>Offer</th><th class="num">Amount</th><th class="num">Rate</th><th class="num">EMI</th><th class="num">Fees</th><th class="num">Total cost</th><th></th></tr></thead><tbody id="compareBody"></tbody></table></div>
+      </div>
+      <div id="loanPaisa" style="margin-top:16px"></div>
+    </section>
+
+    <!-- ================= POCKETRUNWAY ================= -->
+    <section class="page" id="page-pocketrunway">
+      <div class="section-head" style="margin-top:0"><div><button class="btn btn-ghost btn-sm" data-goto="overview" style="margin-bottom:10px">← All Financial Tools</button><h2>PocketRunway — Cash-Flow Forecast</h2><p>Your next 30 days, day by day. Loan EMIs sent from LoanLens appear here automatically. Projected values are estimates — uncertain income is labelled.</p></div><button class="btn btn-primary" id="txnAddBtn">Add transaction</button></div>
+      <div id="loanBanner"></div>
+      <div class="grid kpis pocket-kpis" id="pocketKpis"></div>
+      <div class="grid cols-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Projected balance — next 30 days</h3><div class="sub">Daily projection from today · Dashed line = minimum reserve</div>
+          <div class="chart-wrap" style="margin-top:12px"><div id="pocketChart"></div><div class="chart-tip" id="pocketTip"></div></div>
+          <div class="legend"><span><i style="background:var(--green-text)"></i>Projected balance</span><span><i style="background:var(--amber)"></i>Reserve floor</span></div>
+          <div id="pocketWarnings" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <h3>Forecast settings</h3>
+          <div class="field" style="margin-top:12px"><label for="pkBalance">Available balance today (₹)</label><input id="pkBalance" type="number" min="0" step="500" value="184250"></div>
+          <div class="field"><label for="pkReserve">Minimum reserve to protect (₹)</label><input id="pkReserve" type="number" min="0" step="500" value="25000"><div class="hint">PocketRunway warns you before any day dips below this floor.</div></div>
+          <button class="btn btn-primary" id="pkApply">Recalculate forecast</button>
+          <div class="stat-row" style="margin-top:10px"><span>Total expected income (30 days)</span><b id="pkInc">—</b></div>
+          <div class="stat-row"><span>Total expected outgo (30 days)</span><b id="pkOut">—</b></div>
+          <div class="stat-row"><span>Of which uncertain income</span><b id="pkUnc">—</b></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Income, bills &amp; EMIs</h3><div class="sub">Add, edit or remove entries — the forecast, overview and InvestLab update together.</div>
+        <div style="overflow-x:auto;margin-top:10px"><table class="resp" aria-label="Cash flow transactions"><thead><tr><th>Item</th><th>Date</th><th>Type</th><th>Certainty</th><th class="num">Amount</th><th></th></tr></thead><tbody id="txnBody"></tbody></table></div>
+      </div>
+      <div id="pocketPaisa" style="margin-top:16px"></div>
+    </section>
+
+    <!-- ================= INVESTLAB ================= -->
+    <section class="page" id="page-investlab">
+      <div class="section-head" style="margin-top:0"><div><button class="btn btn-ghost btn-sm" data-goto="overview" style="margin-bottom:10px">← All Financial Tools</button><h2>InvestLab — Decision Simulator</h2><p>What-if comparisons built on your PocketRunway baseline. Changing assumptions here never overwrites your saved forecast. All investment outcomes are <b>hypothetical simulations</b>, not predictions or advice.</p></div><span class="tag tag-demo">SIMULATION</span></div>
+      <div class="card">
+        <h3>Scenario inputs</h3><div class="sub">Baseline auto-filled from PocketRunway: balance <b id="invBaseBal">—</b> · projected month-end <b id="invBaseEnd">—</b></div>
+        <div class="form-2" style="margin-top:14px">
+          <div class="field"><label for="invPrice">Purchase price — buy now (₹)</label><input id="invPrice" type="number" min="0" step="1000" value="120000"></div>
+          <div class="field"><label for="invSaveMonths">If saving first — months to save</label><input id="invSaveMonths" type="number" min="1" max="36" value="6"></div>
+          <div class="field"><label for="invMonthlySave">Monthly saving toward goal (₹)</label><input id="invMonthlySave" type="number" min="0" step="500" value="20000"></div>
+          <div class="field"><label for="invLoanRate">Loan rate if borrowing instead (%)</label><input id="invLoanRate" type="number" min="0" max="30" step="0.1" value="11.5"></div>
+          <div class="field"><label for="invReturn">Hypothetical annual return on surplus (%)</label><input id="invReturn" type="number" min="-20" max="30" step="0.5" value="10"><div class="hint">Illustrative only — markets can fall as well as rise. Downside case uses −8%.</div></div>
+          <div class="field"><label for="invSurplus">Surplus to simulate investing (₹)</label><input id="invSurplus" type="number" min="0" step="1000" value="60000"></div>
+        </div>
+        <button class="btn btn-primary" id="invRun">Run comparison</button>
+      </div>
+      <div class="grid cols-eq" style="margin-top:16px" id="invResults"></div>
+      <div id="invPaisa" style="margin-top:16px"></div>
+    </section>
+
+    <!-- ================= HISTORY ================= -->
+    <section class="page" id="page-history">
+      <div class="section-head" style="margin-top:0"><div><h2>Activity History</h2><p>Every analysis in this workspace — demo records plus anything you run this session.</p></div><button class="btn btn-ghost" id="histCsv">Export CSV</button></div>
+      <div class="card">
+        <div class="table-tools">
+          <input type="search" id="histSearch" placeholder="Search history…" aria-label="Search history">
+          <select id="histModule" aria-label="Filter history by tool"><option value="">All tools</option><option>PaySahi</option><option>TipSahi Verify</option><option>LoanLens</option><option>PocketRunway</option><option>InvestLab</option></select>
+          <select id="histOutcome" aria-label="Filter history by outcome"><option value="">All outcomes</option><option>High Risk</option><option>Suspicious Indicators</option><option>Insufficient Evidence</option><option>Contradicted</option><option>Supported</option><option>Calculated</option><option>Forecast</option><option>Simulated</option></select>
+          <select id="histSort" aria-label="Sort history"><option value="date-desc">Newest first</option><option value="date-asc">Oldest first</option><option value="title">Title A–Z</option></select>
+        </div>
+        <div style="overflow-x:auto"><table class="resp" aria-label="Full activity history"><thead><tr><th>Analysis</th><th>Tool</th><th>Date</th><th>Outcome</th><th class="num">Amount</th><th>Source</th></tr></thead><tbody id="histBody"></tbody></table></div>
+        <div class="pager"><span id="histPageInfo"></span><button class="btn btn-ghost btn-sm" id="histPrev">Previous</button><button class="btn btn-ghost btn-sm" id="histNext">Next</button></div>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="page" id="page-reports">
+      <div class="section-head" style="margin-top:0"><div><h2>Reports</h2><p>Generated summaries from your analyses. Sample reports are labelled; exports download instantly.</p></div></div>
+      <div class="grid cols-eq" id="reportGrid"></div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="page" id="page-settings">
+      <div class="section-head" style="margin-top:0"><div><h2>Settings</h2><p>Preferences for this demo workspace. Changes apply immediately for this session.</p></div></div>
+      <div class="grid cols-eq">
+        <div class="card">
+          <h3>Profile &amp; preferences</h3>
+          <div class="field" style="margin-top:12px"><label for="setName">Display name</label><input id="setName" value="Demo User"></div>
+          <div class="field"><label for="setCurrency">Currency</label><select id="setCurrency"><option value="INR" selected>INR (₹) — default</option><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option></select><div class="hint">Display currency for new summaries. Existing demo figures are recorded in INR.</div></div>
+          <div class="field"><label for="setLang">Language</label><select id="setLang"><option>English</option><option>हिन्दी (Hindi)</option><option>English + हिन्दी (Hinglish)</option><option>मराठी (Marathi)</option><option>தமிழ் (Tamil)</option><option>বাংলা (Bengali)</option></select></div>
+          <div class="field"><label for="setTheme">Theme</label><select id="setTheme"><option value="light">Light</option><option value="dark">Dark</option><option value="system" selected>System — follow device</option></select><div class="hint">Applies instantly to the whole app — sidebar, cards, charts, forms and dialogs. Kept for this session, like every preference here; “System” follows your device’s light/dark setting.</div></div>
+          <div class="field"><label for="setRange">Default overview range</label><select id="setRange"><option>Next 30 days</option><option>Next 60 days</option><option>Next 90 days</option></select></div>
+          <button class="btn btn-primary" id="setSave">Save preferences</button>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Notifications</h3>
+            <div class="toggle-row"><div><b style="font-size:13.5px">High-risk alerts</b><div class="d">Notify when PaySahi flags a high-risk message</div></div><label class="switch"><input type="checkbox" id="ntRisk" checked><span class="tr"></span></label></div>
+            <div class="toggle-row"><div><b style="font-size:13.5px">EMI &amp; bill reminders</b><div class="d">3 days before a commitment is due</div></div><label class="switch"><input type="checkbox" id="ntEmi" checked><span class="tr"></span></label></div>
+            <div class="toggle-row"><div><b style="font-size:13.5px">Reserve warnings</b><div class="d">When the forecast dips below your reserve floor</div></div><label class="switch"><input type="checkbox" id="ntReserve" checked><span class="tr"></span></label></div>
+            <div class="toggle-row"><div><b style="font-size:13.5px">Weekly PaisaPause digest</b><div class="d">One summary of the week’s checks and decisions</div></div><label class="switch"><input type="checkbox" id="ntDigest"><span class="tr"></span></label></div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <h3>Privacy &amp; data</h3>
+            <div class="toggle-row"><div><b style="font-size:13.5px">Retain analysis history</b><div class="d">Keep past checks available in History &amp; Reports</div></div><label class="switch"><input type="checkbox" id="pvRetain" checked><span class="tr"></span></label></div>
+            <div class="toggle-row"><div><b style="font-size:13.5px">Auto-delete after 90 days</b><div class="d">Demo setting — shown for illustration</div></div><label class="switch"><input type="checkbox" id="pvAuto"><span class="tr"></span></label></div>
+            <p style="font-size:12.5px;color:var(--ink2)">TipSahi never asks for UPI PINs, OTPs, card numbers or passwords. In this demo build, everything runs in your browser session and nothing is uploaded or stored on a server.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost" id="pvExport">Download my data (JSON)</button><button class="btn btn-danger" id="pvDelete">Delete session data</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </main>
+    <footer class="foot">TipSahi — Verify. Understand. Decide. · Demo build with sample data. TipSahi does not provide investment advice, guarantee scam detection, or replace your bank’s official channels.</footer>
+  </div>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mnav" aria-label="Mobile navigation">
+  <button data-page="overview" class="active"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Home</button>
+  <button data-page="history"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 7v5l3 3"/></svg>History</button>
+  <button data-page="reports"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>Reports</button>
+  <button data-page="settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>Settings</button>
+</nav>
+
+<!-- New Analysis modal -->
+<div class="modal-back" id="naModal" role="dialog" aria-modal="true" aria-label="Start a new analysis">
+  <div class="modal">
+    <h3>New Analysis</h3>
+    <p style="color:var(--ink2);font-size:13.5px;margin:0 0 14px">Pick a tool — it opens here, in the same shared workspace.</p>
+    <div class="grid" style="gap:8px">
+      <button class="btn btn-ghost" data-goto="paysahi" style="justify-content:flex-start">PaySahi — check a suspicious message</button>
+      <button class="btn btn-ghost" data-goto="verify" style="justify-content:flex-start">TipSahi Verify — fact-check a stock tip</button>
+      <button class="btn btn-ghost" data-goto="loanlens" style="justify-content:flex-start">LoanLens — analyse a loan offer</button>
+      <button class="btn btn-ghost" data-goto="pocketrunway" style="justify-content:flex-start">PocketRunway — update cash-flow forecast</button>
+      <button class="btn btn-ghost" data-goto="investlab" style="justify-content:flex-start">InvestLab — run a what-if scenario</button>
+    </div>
+    <button class="btn btn-ghost" id="naClose" style="margin-top:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- Loan → PocketRunway confirm modal -->
+<div class="modal-back" id="loanModal" role="dialog" aria-modal="true" aria-label="Confirm sending loan to PocketRunway">
+  <div class="modal">
+    <h3>Send this EMI to PocketRunway?</h3>
+    <p style="font-size:13.5px;color:var(--ink2)" id="loanModalText"></p>
+    <div class="notice notice-green" style="margin-bottom:14px">PocketRunway will add this EMI as a monthly commitment from the loan start date and recalculate your forecast, reserve warnings and InvestLab baseline. You can remove it there any time.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="loanConfirm">Yes, add EMI &amp; recalculate</button><button class="btn btn-ghost" id="loanCancel">Not now</button></div>
+  </div>
+</div>
+
+<!-- Transaction modal -->
+<div class="modal-back" id="txnModal" role="dialog" aria-modal="true" aria-label="Add or edit transaction">
+  <div class="modal">
+    <h3 id="txnModalTitle">Add transaction</h3>
+    <form id="txnForm">
+      <div class="field"><label for="txName">Description</label><input id="txName" required placeholder="e.g. Electricity bill"></div>
+      <div class="form-2">
+        <div class="field"><label for="txDate">Date</label><input id="txDate" type="date" required></div>
+        <div class="field"><label for="txAmt">Amount (₹)</label><input id="txAmt" type="number" min="1" step="1" required></div>
+        <div class="field"><label for="txType">Type</label><select id="txType"><option value="expense">Expense / bill</option><option value="income">Income</option><option value="emi">EMI</option></select></div>
+        <div class="field"><label for="txCert">Certainty</label><select id="txCert"><option value="certain">Certain</option><option value="uncertain">Uncertain (expected)</option></select></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="submit" class="btn btn-primary">Save transaction</button><button type="button" class="btn btn-ghost" id="txnCancel">Cancel</button><button type="button" class="btn btn-danger" id="txnDelete" hidden>Delete</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-back" id="detailModal" role="dialog" aria-modal="true" aria-label="Analysis detail">
+  <div class="modal"><h3 id="detailTitle">Detail</h3><div id="detailBody" style="font-size:13.5px"></div><div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-primary" id="detailOpen">Open tool</button><button class="btn btn-ghost" id="detailClose">Close</button></div></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ================= Shared demo dataset (single source of truth) ================= */
+var TODAY = new Date(2026, 9, 18); // 18 Oct 2026
+function dstr(d){ return d.toISOString().slice(0,10); }
+function dadd(days){ var d=new Date(TODAY); d.setDate(d.getDate()+days); return dstr(d); }
+function fmtD(s){ var d=new Date(s+"T00:00:00"); return d.toLocaleDateString("en-IN",{day:"numeric",month:"short"}); }
+function fmtFull(s){ var d=new Date(s+"T00:00:00"); return d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}); }
+function inr(n){ var neg=n<0; n=Math.abs(Math.round(n)); return (neg?"−₹":"₹")+n.toLocaleString("en-IN"); }
+
+/* ================= Motion helpers =================
+   Subtle, short, and disabled under prefers-reduced-motion: count-ups and
+   chart draw-ins are skipped entirely, CSS handles the rest globally. */
+var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+function countUp(el, from, to, money){
+  if(!el) return;
+  if(reduceMotion || from === to){ el.textContent = money ? inr(to) : String(Math.round(to)); return; }
+  var t0 = null, dur = 520;
+  function frame(ts){
+    if(!t0) t0 = ts;
+    var p = Math.min(1, (ts - t0)/dur), e = 1 - Math.pow(1-p, 3), val = from + (to - from)*e;
+    el.textContent = money ? inr(val) : String(Math.round(val));
+    if(p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+function popIn(el){ if(!el) return; el.classList.remove("pop-in"); void el.offsetWidth; el.classList.add("pop-in"); }
+
+var DB = {
+  balance: 184250,
+  reserve: 25000,
+  scenariosCompared: 2,
+  txns: [
+    {id:1, name:"Salary — October (employer)", date:dadd(13), type:"income", amt:145000, cert:"certain", src:"Demo"},
+    {id:2, name:"Freelance design payout (expected)", date:dadd(7), type:"income", amt:18000, cert:"uncertain", src:"Demo"},
+    {id:3, name:"Personal loan EMI — existing", date:dadd(3), type:"emi", amt:18432, cert:"certain", src:"Demo"},
+    {id:4, name:"Home loan EMI", date:dadd(9), type:"emi", amt:31540, cert:"certain", src:"Demo"},
+    {id:5, name:"House rent", date:dadd(4), type:"expense", amt:22000, cert:"certain", src:"Demo"},
+    {id:6, name:"Electricity bill (MSEB)", date:dadd(2), type:"expense", amt:2140, cert:"certain", src:"Demo"},
+    {id:7, name:"Groceries & household", date:dadd(5), type:"expense", amt:9500, cert:"certain", src:"Demo"},
+    {id:8, name:"SIP — index fund", date:dadd(12), type:"expense", amt:15000, cert:"certain", src:"Demo"},
+    {id:9, name:"Insurance premium (term plan)", date:dadd(16), type:"expense", amt:11800, cert:"certain", src:"Demo"},
+    {id:10, name:"Festival shopping (planned)", date:dadd(11), type:"expense", amt:26000, cert:"uncertain", src:"Demo"},
+    {id:11, name:"Mobile + broadband", date:dadd(6), type:"expense", amt:1798, cert:"certain", src:"Demo"},
+    {id:12, name:"School fees — Q3", date:dadd(20), type:"expense", amt:28400, cert:"certain", src:"Demo"}
+  ],
+  nextTxnId: 13,
+  activity: [
+    {id:"a1", title:"KYC “account blocked” SMS from SBI-UPDATE", module:"PaySahi", date:"2026-10-17", outcome:"High Risk", amt:null, src:"Demo", detail:"Message demanded KYC via a look-alike link and an OTP. 5 scam indicators found. Advice: do not click; verify inside the official SBI app; report on cybercrime.gov.in / 1930."},
+    {id:"a2", title:"“Guaranteed multibagger” tip — RELIANCE", module:"TipSahi Verify", date:"2026-10-16", outcome:"Contradicted", amt:null, src:"Demo", detail:"Claim promised guaranteed doubling. Guaranteed-return promises contradict SEBI’s prohibition on assured returns by intermediaries. No filing evidence was supplied with the tip."},
+    {id:"a3", title:"Bank A personal loan — ₹5,00,000 @ 11.5%", module:"LoanLens", date:"2026-10-15", outcome:"Calculated", amt:500000, src:"Demo", detail:"EMI ₹16,488 over 36 months. Total interest ₹93,568; fees ₹7,500; total cost ₹6,01,068 (incl. fees)."},
+    {id:"a4", title:"30-day cash-flow forecast — October", module:"PocketRunway", date:"2026-10-15", outcome:"Forecast", amt:null, src:"Demo", detail:"Lowest projected balance ₹61,340 on 7 Nov. No shortfall against the ₹25,000 reserve in the baseline."},
+    {id:"a5", title:"Scenario: two-wheeler — buy now vs save first", module:"InvestLab", date:"2026-10-14", outcome:"Simulated", amt:120000, src:"Demo", detail:"Hypothetical comparison. Saving first avoided ₹11,240 of loan interest in the simulation; buying now preserved no reserve buffer difference. Simulation only — not advice."},
+    {id:"a6", title:"UPI “cashback prize” WhatsApp forward", module:"PaySahi", date:"2026-10-13", outcome:"High Risk", amt:null, src:"Demo", detail:"Prize lure asking to enter UPI PIN to “receive” money. Receiving money never needs a PIN. 4 indicators found."},
+    {id:"a7", title:"Quarterly results claim — large-cap bank", module:"TipSahi Verify", date:"2026-10-12", outcome:"Insufficient Evidence", amt:null, src:"Demo", detail:"Claim referenced profit growth but no filing, exchange disclosure or date was provided. Verification incomplete in demo mode — check BSE/NSE announcements."},
+    {id:"a8", title:"NBFC quick-loan offer — ₹3,00,000 @ 16%", module:"LoanLens", date:"2026-10-11", outcome:"Calculated", amt:300000, src:"Demo", detail:"EMI ₹10,547 over 36 months. Total interest ₹79,697 plus ₹9,000 fees — a materially higher rate than Bank A, so costlier per rupee borrowed."},
+    {id:"a9", title:"Electricity bill payment reminder check", module:"PaySahi", date:"2026-10-10", outcome:"Suspicious Indicators", amt:2140, src:"Demo", detail:"Sender ID did not match the utility’s official ID and the payment link used a shortened URL. Pay only inside the official app."},
+    {id:"a10", title:"Scenario: higher down payment vs higher loan", module:"InvestLab", date:"2026-10-09", outcome:"Simulated", amt:800000, src:"Demo", detail:"Hypothetical: ₹1,00,000 extra down payment saved ₹34,510 interest over the tenure in simulation, but reduced liquid reserve below the household floor."},
+    {id:"a11", title:"September month-end forecast review", module:"PocketRunway", date:"2026-10-08", outcome:"Forecast", amt:null, src:"Demo", detail:"Projected month-end ₹1,52,900 vs actual ₹1,49,870 — variance from one unplanned expense. Demo record."},
+    {id:"a12", title:"“Income-tax refund” email with attachment", module:"PaySahi", date:"2026-10-06", outcome:"High Risk", amt:null, src:"Demo", detail:"Refund lure with an executable attachment and a non-government sender domain. Income-tax refunds are never processed via email attachments."}
+  ],
+  compare: [],
+  currentLoan: null,
+  loanInPocket: false
+};
+
+/* ================= Loan maths (deterministic) ================= */
+function loanCalc(P, annualRate, months, feePct, charges){
+  var r = annualRate/100/12;
+  var emi = r === 0 ? P/months : P*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);
+  emi = Math.round(emi);
+  var bal = P, totInt = 0, sched = [];
+  for(var i=1;i<=months;i++){
+    var interest = bal*r;
+    var principal = emi - interest;
+    if(i===months){ principal = bal; }
+    bal = Math.max(0, bal-principal);
+    totInt += interest;
+    sched.push({m:i, emi: Math.round(principal+interest), principal: Math.round(principal), interest: Math.round(interest), balance: Math.round(bal)});
+  }
+  var fees = Math.round(P*feePct/100) + (charges||0);
+  return { emi: emi, totalInterest: Math.round(totInt), fees: fees, totalRepay: P + Math.round(totInt), totalCost: P + Math.round(totInt) + fees, sched: sched };
+}
+/* Known test case check: ₹1,00,000 @ 12% for 12 months → EMI ₹8,885 */
+(function(){ var t = loanCalc(100000,12,12,0,0); if(t.emi !== 8885){ console.warn("Loan test case mismatch", t.emi); } })();
+
+/* ================= Forecast engine ================= */
+function forecastSeries(days){
+  days = days || 30;
+  var series = [], bal = DB.balance, lowest = bal, lowestDate = dstr(TODAY);
+  var byDate = {};
+  DB.txns.forEach(function(t){ (byDate[t.date] = byDate[t.date] || []).push(t); });
+  for(var i=0;i<=days;i++){
+    var ds = dadd(i);
+    (byDate[ds]||[]).forEach(function(t){ bal += (t.type==="income" ? t.amt : -t.amt); });
+    series.push({date: ds, bal: bal});
+    if(bal < lowest){ lowest = bal; lowestDate = ds; }
+  }
+  return { series: series, lowest: lowest, lowestDate: lowestDate, end: series[series.length-1].bal };
+}
+function txnTotals(){
+  var inc=0, out=0, unc=0;
+  DB.txns.forEach(function(t){
+    if(t.date < dstr(TODAY) || t.date > dadd(30)) return;
+    if(t.type==="income"){ inc += t.amt; if(t.cert==="uncertain") unc += t.amt; } else out += t.amt;
+  });
+  return {inc:inc, out:out, unc:unc};
+}
+
+/* ================= SVG line chart with tooltip ================= */
+function lineChart(el, tipEl, series, floor, ariaLabel){
+  var W=640,H=240,P={l:64,r:36,t:14,b:30};
+  var max = Math.max.apply(null, series.map(function(p){return p.bal;})) * 1.08;
+  var min = Math.min(0, Math.min.apply(null, series.map(function(p){return p.bal;})) * 1.1);
+  function X(i){ return P.l + (W-P.l-P.r) * i/(series.length-1); }
+  function Y(v){ return P.t + (H-P.t-P.b) * (1 - (v-min)/(max-min)); }
+  var pts = series.map(function(p,i){ return X(i).toFixed(1)+","+Y(p.bal).toFixed(1); }).join(" ");
+  var area = P.l+","+Y(min)+" "+pts+" "+X(series.length-1).toFixed(1)+","+Y(min);
+  var grid="", ticks=4;
+  for(var g=0; g<=ticks; g++){
+    var v = min + (max-min)*g/ticks, y = Y(v);
+    grid += '<line x1="'+P.l+'" y1="'+y+'" x2="'+(W-P.r)+'" y2="'+y+'" stroke="var(--chart-grid)" stroke-width="1"/>'
+      + '<text x="'+(P.l-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10.5" fill="var(--ink2)">₹'+Math.round(v/1000)+'k</text>';
+  }
+  var xlab="";
+  [0, Math.floor(series.length/2), series.length-1].forEach(function(i){
+    xlab += '<text x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10.5" fill="var(--ink2)">'+fmtD(series[i].date)+'</text>';
+  });
+  var floorY = (floor>=min && floor<=max) ? '<line x1="'+P.l+'" y1="'+Y(floor)+'" x2="'+(W-P.r)+'" y2="'+Y(floor)+'" stroke="var(--amber)" stroke-width="1.6" stroke-dasharray="6 4"/><text x="'+(W-P.r)+'" y="'+(Y(floor)-6)+'" text-anchor="end" font-size="10.5" fill="var(--amber-text)" font-weight="700">Reserve '+inr(floor)+'</text>' : '';
+  el.innerHTML = '<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="'+ariaLabel+'" style="display:block">'
+    + grid + floorY
+    + '<polygon points="'+area+'" fill="var(--chart-fill)"/>'
+    + '<polyline points="'+pts+'" fill="none" stroke="var(--green-text)" stroke-width="2.4" stroke-linejoin="round"/>'
+    + '<circle id="hovDot" r="4.5" fill="var(--green-text)" stroke="#fff" stroke-width="2" style="display:none"/>'
+    + xlab + '<rect id="hovZone" x="'+P.l+'" y="'+P.t+'" width="'+(W-P.l-P.r)+'" height="'+(H-P.t-P.b)+'" fill="transparent"/></svg>';
+  var svg = el.querySelector("svg"), dot = el.querySelector("#hovDot"), zone = el.querySelector("#hovZone");
+  /* Draw-in: the line traces itself once per render (data/filter/theme
+     change) while the area fades in under it. Skipped for reduced motion. */
+  if(!reduceMotion){
+    var lineEl = el.querySelector("polyline"), areaEl = el.querySelector("polygon");
+    try{
+      if(lineEl && lineEl.getTotalLength){
+        var len = lineEl.getTotalLength();
+        lineEl.style.strokeDasharray = String(len);
+        lineEl.style.strokeDashoffset = String(len);
+        void lineEl.getBoundingClientRect();
+        lineEl.style.transition = "stroke-dashoffset .65s cubic-bezier(.22,.68,.32,1)";
+        lineEl.style.strokeDashoffset = "0";
+        setTimeout(function(){ lineEl.style.strokeDasharray = "none"; lineEl.style.transition = ""; lineEl.style.strokeDashoffset = ""; }, 760);
+      }
+      if(areaEl){
+        areaEl.style.opacity = "0";
+        areaEl.style.transition = "opacity .5s ease .15s";
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){ areaEl.style.opacity = "1"; }); });
+      }
+    }catch(e){ /* draw-in is decorative — the static chart remains fully readable */ }
+  }
+  zone.addEventListener("mousemove", function(ev){
+    var rect = svg.getBoundingClientRect();
+    var x = (ev.clientX-rect.left) * (W/rect.width);
+    var i = Math.round((x-P.l)/((W-P.l-P.r)/(series.length-1)));
+    i = Math.max(0, Math.min(series.length-1, i));
+    dot.style.display="block"; dot.setAttribute("cx", X(i)); dot.setAttribute("cy", Y(series[i].bal));
+    tipEl.style.opacity="1";
+    tipEl.textContent = fmtFull(series[i].date)+" · "+inr(series[i].bal);
+    tipEl.style.left = Math.min(rect.width-130, Math.max(0, ev.clientX-rect.left+10))+"px";
+    tipEl.style.top = (ev.clientY-rect.top-38)+"px";
+  });
+  zone.addEventListener("mouseleave", function(){ dot.style.display="none"; tipEl.style.opacity="0"; });
+  /* Keyboard inspection: focus the chart, arrow keys move day by day */
+  el.setAttribute("tabindex","0");
+  el.setAttribute("aria-label", ariaLabel+". Focus here and use the left and right arrow keys to inspect each day.");
+  var ki = series.length-1;
+  function showPoint(i){
+    ki = Math.max(0, Math.min(series.length-1, i));
+    var rect = svg.getBoundingClientRect();
+    dot.style.display="block"; dot.setAttribute("cx", X(ki)); dot.setAttribute("cy", Y(series[ki].bal));
+    tipEl.style.opacity="1";
+    tipEl.textContent = fmtFull(series[ki].date)+" · "+inr(series[ki].bal);
+    tipEl.style.left = Math.max(0, Math.min(rect.width-130, rect.width * X(ki)/W - 10))+"px";
+    tipEl.style.top = Math.max(0, rect.height * Y(series[ki].bal)/H - 38)+"px";
+  }
+  el.addEventListener("keydown", function(e){
+    if(e.key==="ArrowRight"){ e.preventDefault(); showPoint(ki+1); }
+    else if(e.key==="ArrowLeft"){ e.preventDefault(); showPoint(ki-1); }
+    else if(e.key==="Home"){ e.preventDefault(); showPoint(0); }
+    else if(e.key==="End"){ e.preventDefault(); showPoint(series.length-1); }
+  });
+  el.addEventListener("blur", function(){ dot.style.display="none"; tipEl.style.opacity="0"; });
+}
+
+/* ================= PaisaPause panel ================= */
+function paisaPause(o){
+  function ul(items){ return "<ul>"+items.map(function(i){return "<li>"+i+"</li>";}).join("")+"</ul>"; }
+  return '<div class="paisapause"><h3><span class="pp-mark">❚❚</span>PaisaPause — pause &amp; decide <span class="tag tag-info">SHARED SUMMARY</span></h3>'
+    + '<p style="font-size:13px;color:var(--ink2);margin:6px 0 0">'+o.intro+'</p><div class="pp-grid">'
+    + '<div><h4>Evidence &amp; numbers</h4>'+ul(o.evidence)+'</div>'
+    + '<div><h4>Cash-flow consequence</h4>'+ul(o.cashflow)+'</div>'
+    + '<div><h4>Missing information</h4>'+ul(o.missing)+'</div>'
+    + '<div><h4>Uncertainty &amp; limits</h4>'+ul(o.limits)+'</div>'
+    + '</div><h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:14px 0 4px">Verify before you act</h4>'+ul(o.steps)+'</div>';
+}
+
+/* ================= Navigation ================= */
+var TITLES = { overview:"Overview", paysahi:"PaySahi — UPI Scam Shield", verify:"TipSahi Verify", loanlens:"LoanLens", pocketrunway:"PocketRunway", investlab:"InvestLab", history:"Activity History", reports:"Reports", settings:"Settings" };
+var FEATURE_PAGES = ["paysahi","verify","loanlens","pocketrunway","investlab"];
+var currentPage = "overview";
+var freshTimer = null;
+function go(page){
+  currentPage = page;
+  document.querySelectorAll(".page").forEach(function(p){ p.classList.toggle("active", p.id==="page-"+page); });
+  /* Entrance stagger for dashboard cards, once per page entry */
+  var sec = document.getElementById("page-"+page);
+  sec.classList.remove("fresh"); void sec.offsetWidth; sec.classList.add("fresh");
+  clearTimeout(freshTimer);
+  freshTimer = setTimeout(function(){ sec.classList.remove("fresh"); }, 1000);
+  document.querySelectorAll("#mainNav button, .mnav button").forEach(function(b){ b.classList.toggle("active", b.dataset.page===page); });
+  if(FEATURE_PAGES.indexOf(page)>=0){ var fg = document.getElementById("ftGroup"); if(fg && fg.classList.contains("collapsed")){ fg.classList.remove("collapsed"); document.getElementById("ftToggle").setAttribute("aria-expanded","true"); } }
+  document.getElementById("pageTitle").textContent = TITLES[page];
+  document.getElementById("crumb").textContent = "TipSahi / " + (FEATURE_PAGES.indexOf(page)>=0 ? "Financial Tools / " : "") + TITLES[page];
+  document.getElementById("sidebar").classList.add("closed");
+  if(window.innerWidth > 900) document.getElementById("sidebar").classList.remove("closed");
+  window.scrollTo({top:0});
+  if(page==="overview") renderOverview();
+  if(page==="history") renderHistory();
+  if(page==="reports") renderReports();
+}
+document.querySelectorAll("[data-page]").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.page); }); });
+document.getElementById("ftToggle").addEventListener("click", function(){
+  var collapsed = document.getElementById("ftGroup").classList.toggle("collapsed");
+  this.setAttribute("aria-expanded", String(!collapsed));
+});
+document.querySelectorAll("[data-goto]").forEach(function(b){ b.addEventListener("click", function(){ closeModal("naModal"); document.getElementById("notifPop").classList.remove("open"); document.getElementById("profilePop").classList.remove("open"); document.getElementById("themePop").classList.remove("open"); go(b.dataset.goto); }); });
+var sb = document.getElementById("sidebar");
+if(window.innerWidth <= 900){ sb.style.transition = "none"; sb.classList.add("closed"); void sb.offsetWidth; sb.style.transition = ""; }
+document.getElementById("menuBtn").addEventListener("click", function(){ sb.classList.toggle("closed"); });
+
+/* Topbar */
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function openModal(id){ document.getElementById(id).classList.add("open"); }
+document.getElementById("newAnalysisBtn").addEventListener("click", function(){ openModal("naModal"); });
+document.getElementById("naClose").addEventListener("click", function(){ closeModal("naModal"); });
+document.getElementById("notifBtn").addEventListener("click", function(e){ e.stopPropagation(); document.getElementById("notifPop").classList.toggle("open"); document.getElementById("profilePop").classList.remove("open"); document.getElementById("themePop").classList.remove("open"); });
+document.getElementById("profileBtn").addEventListener("click", function(e){ e.stopPropagation(); document.getElementById("profilePop").classList.toggle("open"); document.getElementById("notifPop").classList.remove("open"); document.getElementById("themePop").classList.remove("open"); });
+document.addEventListener("click", function(){ document.getElementById("notifPop").classList.remove("open"); document.getElementById("profilePop").classList.remove("open"); document.getElementById("themePop").classList.remove("open"); document.getElementById("themeBtn").setAttribute("aria-expanded","false"); });
+document.getElementById("signOutItem").addEventListener("click", function(){ toast("Demo build — sign-out is disabled. Your session data stays in this tab only."); });
+document.getElementById("globalSearch").addEventListener("keydown", function(e){
+  if(e.key !== "Enter") return;
+  var q = e.target.value.trim().toLowerCase();
+  var hit = DB.activity.filter(function(a){ return (a.title+" "+a.module+" "+a.outcome).toLowerCase().indexOf(q) >= 0; })[0];
+  if(hit){ go("history"); document.getElementById("histSearch").value = e.target.value; renderHistory(); toast("Found in Activity History: "+hit.title); }
+  else toast("No matching analysis found for “"+e.target.value+"”. Try History search.");
+});
+
+/* ================= Theme — Light / Dark / System =================
+   The choice lives in the app's session state (like every other TipSahi
+   preference in this build) and drives the data-theme token set, so the
+   sidebar, header, cards, charts, forms, dialogs and dropdowns all switch
+   together. "System" follows the device setting and updates live. */
+var themePref = "system";
+var themeMQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : { matches:false };
+function resolvedTheme(){ return themePref === "system" ? (themeMQ.matches ? "dark" : "light") : themePref; }
+function themeLabel(){ return themePref === "system" ? "System · "+resolvedTheme() : (themePref === "dark" ? "Dark" : "Light"); }
+function syncThemeUI(){
+  document.querySelectorAll(".theme-opt").forEach(function(b){ b.setAttribute("aria-checked", b.dataset.themeChoice === themePref ? "true" : "false"); });
+  var sel = document.getElementById("setTheme"); if(sel) sel.value = themePref;
+  document.getElementById("themeBtn").setAttribute("aria-label", "Theme: "+themeLabel()+". Change theme");
+}
+function applyTheme(rerender){
+  document.documentElement.setAttribute("data-theme", resolvedTheme());
+  document.documentElement.setAttribute("data-theme-pref", themePref);
+  syncThemeUI();
+  if(rerender){ renderOverview(); renderPocket(); } /* charts read theme tokens — redraw them in the new palette */
+}
+function setTheme(pref){
+  themePref = pref;
+  applyTheme(true);
+  toast("Appearance: "+themeLabel()+" — applied across the whole app.");
+}
+document.getElementById("themeBtn").addEventListener("click", function(e){
+  e.stopPropagation();
+  var p = document.getElementById("themePop");
+  p.classList.toggle("open");
+  document.getElementById("notifPop").classList.remove("open");
+  document.getElementById("profilePop").classList.remove("open");
+  this.setAttribute("aria-expanded", p.classList.contains("open") ? "true" : "false");
+});
+document.querySelectorAll(".theme-opt").forEach(function(b){ b.addEventListener("click", function(){
+  document.getElementById("themePop").classList.remove("open");
+  document.getElementById("themeBtn").setAttribute("aria-expanded","false");
+  setTheme(b.dataset.themeChoice);
+}); });
+document.getElementById("setTheme").addEventListener("change", function(){ setTheme(this.value); });
+if(themeMQ.addEventListener) themeMQ.addEventListener("change", function(){ if(themePref === "system") applyTheme(true); });
+applyTheme(false);
+
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+var toastTimer;
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove("show"); }, 3400); }
+function outcomeTag(o){
+  if(o==="High Risk") return '<span class="tag tag-high">High Risk</span>';
+  if(o==="Suspicious Indicators") return '<span class="tag tag-susp">Suspicious</span>';
+  if(o==="Contradicted") return '<span class="tag tag-high">Contradicted</span>';
+  if(o==="Supported") return '<span class="tag tag-ok">Supported</span>';
+  if(o==="Insufficient Evidence") return '<span class="tag tag-susp">Insufficient Evidence</span>';
+  if(o==="Calculated") return '<span class="tag tag-ok">Calculated</span>';
+  if(o==="Forecast") return '<span class="tag tag-info">Forecast</span>';
+  if(o==="Simulated") return '<span class="tag tag-info">Simulated</span>';
+  return '<span class="tag tag-info">'+o+'</span>';
+}
+function addActivity(title, module, outcome, amt, detail){
+  DB.activity.unshift({id:"u"+Date.now(), title:title, module:module, date:dstr(TODAY), outcome:outcome, amt:amt||null, src:"You · this session", detail:detail});
+  renderOverview(); /* keep dashboard KPIs, charts and recent activity in sync with feature results */
+}
+
+/* ================= Overview ================= */
+var actPage = 0, ACT_PER = 5;
+/* ---- Dashboard date range (filters records; forecast looks the same span ahead) ---- */
+var dashRange = { mode:"preset", days:30 };
+function rangeStart(){ return dashRange.mode==="custom" ? dashRange.from : (dashRange.days ? dadd(-(dashRange.days-1)) : "0000-01-01"); }
+function rangeEnd(){ return dashRange.mode==="custom" ? dashRange.to : dstr(TODAY); }
+function inRange(ds){ return ds >= rangeStart() && ds <= rangeEnd(); }
+function horizonDays(){
+  if(dashRange.mode==="custom"){ var diff = Math.round((new Date(dashRange.to+"T00:00:00") - TODAY)/86400000); return Math.max(7, Math.min(90, diff > 0 ? diff : 30)); }
+  return dashRange.days ? Math.min(dashRange.days, 90) : 30;
+}
+function rangeText(){
+  if(dashRange.mode==="custom") return fmtFull(dashRange.from)+" – "+fmtFull(dashRange.to);
+  return dashRange.days ? "Last "+dashRange.days+" days" : "All time";
+}
+function rangeActivities(){ return DB.activity.filter(function(a){ return inRange(a.date); }); }
+function setHistFilters(q, mod, out){
+  document.getElementById("histSearch").value = q;
+  document.getElementById("histModule").value = mod;
+  document.getElementById("histOutcome").value = out;
+  histPage = 0;
+}
+function kpiGo(kind){
+  if(kind==="hist-all"){ setHistFilters("", "", ""); go("history"); }
+  else if(kind==="hist-risk"){ setHistFilters("", "", "High Risk"); go("history"); }
+  else go(kind);
+}
+var kpiPrev = {}; /* last shown KPI numbers, by card index — count-up runs only when a value actually changes */
+function renderOverview(){
+  var horizon = horizonDays();
+  var f = forecastSeries(horizon);
+  var ranged = rangeActivities();
+  var highRisk = ranged.filter(function(a){ return a.outcome==="High Risk"; }).length;
+  var winEnd = dadd(horizon);
+  var upcomingEmi = DB.txns.filter(function(x){ return x.type==="emi" && x.date >= dstr(TODAY) && x.date <= winEnd; }).reduce(function(s,x){ return s+x.amt; },0);
+  var scenarios = ranged.filter(function(a){ return a.module==="InvestLab"; }).length;
+  var projLabel = horizon===30 ? "Projected Month-End Balance" : "Projected Balance — "+horizon+" Days";
+  var kpis = [
+    {l:"Checks Completed", v: ranged.length, num: ranged.length, n: rangeText()+" · across all 5 tools", go:"hist-all"},
+    {l:"High-Risk Items", v: highRisk, num: highRisk, n:"In range — open the filtered list", cls:"bad", go:"hist-risk"},
+    {l:"Upcoming Loan Commitments", v: inr(upcomingEmi), num: upcomingEmi, money:true, n:"EMI due in next "+horizon+" days", go:"pocketrunway"},
+    {l:"Available Balance", v: inr(DB.balance), num: DB.balance, money:true, n:"As of today · demo account", go:"pocketrunway"},
+    {l:projLabel, v: inr(f.end), num: f.end, money:true, n:"Lowest point "+inr(f.lowest)+" on "+fmtD(f.lowestDate), cls: f.lowest < DB.reserve ? "warn":"", go:"pocketrunway"},
+    {l:"Scenarios Compared", v: scenarios, num: scenarios, n:"InvestLab runs in range · simulations only", go:"investlab"}
+  ];
+  document.getElementById("kpiGrid").innerHTML = kpis.map(function(k, i){
+    return '<button class="card kpi" data-kpi="'+k.go+'" aria-label="'+k.l+': '+k.v+'. Activate to open the related view."><span class="k-label">'+k.l+'</span><span class="k-value" data-kval="'+i+'">'+k.v+'</span><span class="k-note '+(k.cls||"")+'">'+k.n+'</span></button>';
+  }).join("");
+  document.querySelectorAll("#kpiGrid [data-kpi]").forEach(function(b){ b.addEventListener("click", function(){ kpiGo(b.dataset.kpi); }); });
+  /* Count-up only on change: first render and unchanged values stay static */
+  kpis.forEach(function(k, i){
+    if(k.num == null) return;
+    var prev = kpiPrev[i];
+    kpiPrev[i] = k.num;
+    if(prev !== undefined && prev !== k.num) countUp(document.querySelector('#kpiGrid [data-kval="'+i+'"]'), prev, k.num, k.money);
+  });
+  document.getElementById("ovChartTitle").textContent = "Cash-flow forecast — next "+horizon+" days";
+  document.getElementById("ovChartSub").innerHTML = 'Projected daily balance from PocketRunway · Dashed line = your '+inr(DB.reserve)+' minimum reserve · <span class="tag tag-demo">DEMO DATA</span>';
+  lineChart(document.getElementById("overviewChart"), document.getElementById("overviewTip"), f.series, DB.reserve, "Line chart of projected daily balance for the next "+horizon+" days");
+  /* Outcome distribution — in range, bars filter the activity table */
+  var counts = {};
+  ranged.forEach(function(a){ counts[a.outcome] = (counts[a.outcome]||0)+1; });
+  var order = ["High Risk","Contradicted","Suspicious Indicators","Insufficient Evidence","Calculated","Forecast","Simulated"];
+  var colors = {"High Risk":cssVar("--c-danger"),"Contradicted":cssVar("--c-danger"),"Suspicious Indicators":cssVar("--c-warn"),"Insufficient Evidence":cssVar("--c-warn"),"Calculated":cssVar("--c-ok"),"Forecast":cssVar("--c-ok"),"Simulated":cssVar("--c-neutral")};
+  var total = ranged.length, bars="", bi = 0;
+  order.forEach(function(o){
+    if(!counts[o]) return;
+    var w = Math.round(counts[o]/total*100);
+    bars += '<button class="outcome-btn" data-outcome="'+o+'" title="'+counts[o]+' of '+total+' checks ('+w+'%) — select to filter Recent activity" aria-label="Filter activity by outcome '+o+': '+counts[o]+' checks"><span style="display:flex;justify-content:space-between;font-size:12.5px"><span class="ob-name">'+o+'</span><b>'+counts[o]+' ('+w+'%)</b></span>'
+      + '<span class="ob-track"><span class="ob-fill" style="width:'+Math.max(w,3)+'%;background:'+colors[o]+';animation-delay:'+(bi++*55)+'ms"></span></span></button>';
+  });
+  document.getElementById("outcomeChart").innerHTML = total ? bars : '<div class="empty">No checks fall in the selected range yet.<br>Run one from Quick actions, or widen the range.</div>';
+  document.getElementById("outcomeLegend").innerHTML = '<span>Total checks in range: <b>'+total+'</b> · Demo dataset — not product performance statistics.</span>';
+  document.querySelectorAll("#outcomeChart [data-outcome]").forEach(function(b){ b.addEventListener("click", function(){
+    document.getElementById("actOutcome").value = b.dataset.outcome;
+    actPage = 0; renderActivityTable();
+    document.getElementById("actCard").scrollIntoView({block:"start"});
+    toast("Recent activity filtered to outcome: "+b.dataset.outcome);
+  }); });
+  /* Attention — in range, rows open the detail view */
+  var att = ranged.filter(function(a){ return ["High Risk","Contradicted","Suspicious Indicators"].indexOf(a.outcome)>=0; }).slice(0,4);
+  document.getElementById("attentionList").innerHTML = att.length ? att.map(function(a){
+    return '<button class="att-btn" data-att="'+a.id+'" aria-label="Open details: '+a.title.replace(/"/g,"&quot;")+'"><span style="flex:1;min-width:0"><span class="t" style="display:block;font-weight:600;font-size:13.5px">'+a.title+'</span><span style="display:block;font-size:12.5px;color:var(--ink2)">'+a.module+' · '+fmtFull(a.date)+' · '+a.src+'</span></span>'+outcomeTag(a.outcome)+'</button>';
+  }).join("") : '<div class="empty">Nothing needs attention in this range. High-risk, contradicted and suspicious results will appear here.</div>';
+  document.querySelectorAll("#attentionList [data-att]").forEach(function(b){ b.addEventListener("click", function(){
+    var a = DB.activity.filter(function(x){ return x.id===b.dataset.att; })[0];
+    if(a) openDetail(a);
+  }); });
+  /* Commitments — due within the forecast horizon, rows open PocketRunway */
+  var commits = DB.txns.filter(function(x){ return x.type!=="income" && x.date >= dstr(TODAY) && x.date <= winEnd; }).sort(function(a,b){ return a.date<b.date?-1:1; }).slice(0,5);
+  document.getElementById("commitList").innerHTML = (commits.length ? commits.map(function(x){
+    return '<button class="att-btn" data-goto="pocketrunway"><span style="flex:1;min-width:0"><span class="t" style="display:block;font-weight:600;font-size:13.5px">'+x.name+'</span><span style="display:block;font-size:12.5px;color:var(--ink2)">Due '+fmtFull(x.date)+(x.cert==="uncertain"?' · <span style="color:var(--amber-text);font-weight:600">uncertain</span>':"")+'</span></span><b>'+inr(x.amt)+'</b></button>';
+  }).join("") : '<div class="empty">No commitments due in the next '+horizon+' days.</div>') + '<button class="btn btn-ghost btn-sm" data-goto="pocketrunway" style="margin-top:10px">Open PocketRunway</button>';
+  document.querySelectorAll('#commitList [data-goto]').forEach(function(b){ b.addEventListener("click", function(){ go("pocketrunway"); }); });
+  /* Financial Tools — feature cards, stats live from the shared dataset */
+  function modCount(m){ return DB.activity.filter(function(a){ return a.module===m; }).length; }
+  var tools = [
+    {page:"paysahi", name:"PaySahi", sub:"UPI SCAM SHIELD", desc:"Paste a suspicious bank, KYC or payment message and get an explained risk verdict with practical next steps.", act:"Check a message", stat: modCount("PaySahi")+" checks in History", icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>'},
+    {page:"verify", name:"TipSahi Verify", sub:"STOCK-TIP FACT CHECKER", desc:"Test a forwarded tip or financial claim against evidence — verdicts stay honest about what can and cannot be confirmed.", act:"Verify a claim", stat: modCount("TipSahi Verify")+" claims checked", icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11l2 2 4-4"/></svg>'},
+    {page:"loanlens", name:"LoanLens", sub:"LOAN COST ANALYSIS", desc:"Exact EMI, fees and total borrowing cost for any offer, with side-by-side comparison — deterministic maths, no guessing.", act:"Calculate a loan", stat: DB.compare.length+" offers in comparison", icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>'},
+    {page:"pocketrunway", name:"PocketRunway", sub:"CASH-FLOW FORECAST", desc:"See your next 30 days day by day — income, bills and EMIs — with warnings before your balance dips below your reserve.", act:"Forecast cash flow", stat: (horizon===30 ? "Month-end projection " : horizon+"-day projection ")+inr(f.end), icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-6 4 3 6-8"/><path d="M3 21h18"/></svg>'},
+    {page:"investlab", name:"InvestLab", sub:"DECISION SIMULATOR", desc:"Compare buy-now vs save-first and other what-ifs side by side, built on your PocketRunway baseline. Simulations, not advice.", act:"Compare scenarios", stat: DB.scenariosCompared+" scenarios compared", icon:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>'}
+  ];
+  document.getElementById("toolsGrid").innerHTML = tools.map(function(t){
+    return '<button class="tool-card" data-goto="'+t.page+'"><span class="t-ic">'+t.icon+'</span><span class="t-sub">'+t.sub+'</span><span class="t-name">'+t.name+'</span><span class="t-desc">'+t.desc+'</span><span class="t-foot"><span class="t-stat">'+t.stat+'</span><span class="t-act">'+t.act+' →</span></span></button>';
+  }).join("");
+  document.querySelectorAll('#toolsGrid [data-goto]').forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.goto); }); });
+  renderActivityTable();
+}
+function filteredActivity(q, mod, sort){
+  var rows = DB.activity.filter(function(a){
+    return (!q || (a.title+" "+a.outcome).toLowerCase().indexOf(q.toLowerCase())>=0) && (!mod || a.module===mod);
+  });
+  if(sort==="date-asc") rows.sort(function(a,b){ return a.date<b.date?-1:1; });
+  else if(sort==="title") rows.sort(function(a,b){ return a.title<b.title?-1:1; });
+  else rows.sort(function(a,b){ return a.date>b.date?-1:1; });
+  return rows;
+}
+function renderActivityTable(){
+  var rows = filteredActivity(document.getElementById("actSearch").value, document.getElementById("actModule").value, document.getElementById("actSort").value)
+    .filter(function(a){ return inRange(a.date); });
+  var oc = document.getElementById("actOutcome").value;
+  if(oc) rows = rows.filter(function(a){ return a.outcome === oc; });
+  var pages = Math.max(1, Math.ceil(rows.length/ACT_PER));
+  actPage = Math.min(actPage, pages-1);
+  var slice = rows.slice(actPage*ACT_PER, actPage*ACT_PER+ACT_PER);
+  document.getElementById("actBody").innerHTML = slice.length ? slice.map(function(a){
+    return '<tr data-id="'+a.id+'"><td data-l="Analysis"><b>'+a.title+'</b><br><span style="color:var(--ink2);font-size:12px">'+a.src+'</span></td><td data-l="Module">'+a.module+'</td><td data-l="Date">'+fmtFull(a.date)+'</td><td data-l="Outcome">'+outcomeTag(a.outcome)+'</td><td data-l="Amount" class="num">'+(a.amt?inr(a.amt):"—")+'</td></tr>';
+  }).join("") : '<tr><td colspan="5"><div class="empty">No activity matches your filters in the selected range. Widen the dashboard range or clear a filter.</div></td></tr>';
+  document.getElementById("actPageInfo").textContent = "Page "+(actPage+1)+" of "+pages+" · "+rows.length+" records";
+  document.getElementById("actPrev").disabled = actPage===0;
+  document.getElementById("actNext").disabled = actPage>=pages-1;
+  bindRowClicks(document.getElementById("actBody"));
+}
+["actSearch","actModule","actSort","actOutcome"].forEach(function(id){ document.getElementById(id).addEventListener("input", function(){ actPage=0; renderActivityTable(); }); });
+document.getElementById("actPrev").addEventListener("click", function(){ if(actPage>0){ actPage--; renderActivityTable(); } });
+document.getElementById("actNext").addEventListener("click", function(){ actPage++; renderActivityTable(); });
+
+/* ---- Range controls: presets + validated custom range, with loading state ---- */
+function syncRangeUI(){
+  document.querySelectorAll(".range-preset").forEach(function(b){
+    var active = dashRange.mode==="preset" && ((b.dataset.days==="all" && dashRange.days===null) || parseInt(b.dataset.days,10)===dashRange.days);
+    b.classList.toggle("active", !!active);
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+}
+function applyRange(){
+  var st = document.getElementById("rangeStatus");
+  st.innerHTML = '<span class="spinner dark"></span> Updating dashboard…';
+  document.getElementById("page-overview").setAttribute("aria-busy","true");
+  setTimeout(function(){
+    renderOverview();
+    document.getElementById("page-overview").removeAttribute("aria-busy");
+    st.textContent = "Showing "+rangeText().toLowerCase()+" · "+rangeActivities().length+" checks · forecast looks "+horizonDays()+" days ahead";
+  }, 220);
+}
+document.querySelectorAll(".range-preset").forEach(function(b){ b.addEventListener("click", function(){
+  dashRange = b.dataset.days==="all" ? {mode:"preset", days:null} : {mode:"preset", days:parseInt(b.dataset.days,10)};
+  document.getElementById("rangeErr").hidden = true;
+  syncRangeUI(); applyRange();
+}); });
+document.getElementById("rangeApply").addEventListener("click", function(){
+  var from = document.getElementById("rangeFrom"), to = document.getElementById("rangeTo"), err = document.getElementById("rangeErr");
+  from.removeAttribute("aria-invalid"); to.removeAttribute("aria-invalid");
+  if(!from.value || !to.value){
+    err.textContent = "Choose both a start and an end date for a custom range."; err.hidden = false;
+    var bad = !from.value ? from : to; bad.setAttribute("aria-invalid","true"); bad.focus(); return;
+  }
+  if(from.value > to.value){
+    err.textContent = "Start date must be on or before the end date."; err.hidden = false;
+    from.setAttribute("aria-invalid","true"); from.focus(); return;
+  }
+  err.hidden = true;
+  dashRange = {mode:"custom", from:from.value, to:to.value};
+  syncRangeUI(); applyRange();
+  toast("Dashboard range applied: "+rangeText());
+});
+syncRangeUI();
+
+/* ---- Quick actions: open the tool, first field focused (forecast opens the add-entry dialog) ---- */
+document.querySelectorAll("[data-quick]").forEach(function(b){ b.addEventListener("click", function(){
+  var target = b.dataset.quick;
+  if(target==="pocket"){ go("pocketrunway"); openTxn(null); return; }
+  go(target);
+  var f = document.getElementById(b.dataset.focus);
+  if(f) setTimeout(function(){ f.focus(); }, 60);
+}); });
+var MODULE_PAGE = {"PaySahi":"paysahi","TipSahi Verify":"verify","LoanLens":"loanlens","PocketRunway":"pocketrunway","InvestLab":"investlab"};
+function openDetail(a){
+  document.getElementById("detailTitle").textContent = a.title;
+  document.getElementById("detailBody").innerHTML = '<div class="stat-row"><span>Tool</span><b>'+a.module+'</b></div><div class="stat-row"><span>Date</span><b>'+fmtFull(a.date)+'</b></div><div class="stat-row"><span>Outcome</span><b>'+a.outcome+'</b></div><div class="stat-row"><span>Amount</span><b>'+(a.amt?inr(a.amt):"—")+'</b></div><div class="stat-row"><span>Record type</span><b>'+a.src+'</b></div><p style="margin-top:12px">'+a.detail+'</p>';
+  var ob = document.getElementById("detailOpen");
+  ob.style.display = "";
+  ob.textContent = "Open in "+a.module;
+  ob.onclick = function(){ closeModal("detailModal"); go(MODULE_PAGE[a.module]); };
+  openModal("detailModal");
+  ob.focus();
+}
+function bindRowClicks(tbody){
+  tbody.querySelectorAll("tr[data-id]").forEach(function(tr){
+    var a = DB.activity.filter(function(x){ return x.id===tr.dataset.id; })[0];
+    if(!a) return;
+    tr.setAttribute("tabindex","0");
+    tr.setAttribute("role","button");
+    tr.setAttribute("aria-label","Open detail view: "+a.title);
+    function open(){ openDetail(a); }
+    tr.addEventListener("click", open);
+    tr.addEventListener("keydown", function(e){ if(e.key==="Enter" || e.key===" "){ e.preventDefault(); open(); } });
+  });
+}
+document.getElementById("detailClose").addEventListener("click", function(){ closeModal("detailModal"); });
+document.addEventListener("keydown", function(e){
+  if(e.key !== "Escape") return;
+  if(document.getElementById("detailModal").classList.contains("open")) closeModal("detailModal");
+  else if(document.getElementById("txnModal").classList.contains("open")) closeModal("txnModal");
+  else if(document.getElementById("loanModal").classList.contains("open")) closeModal("loanModal");
+  else if(document.getElementById("naModal").classList.contains("open")) closeModal("naModal");
+});
+
+/* ================= PaySahi ================= */
+var payHistory = [];
+function wireUpload(boxId, fileId, nameId){
+  var box = document.getElementById(boxId), file = document.getElementById(fileId);
+  box.addEventListener("click", function(){ file.click(); });
+  box.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); file.click(); } });
+  file.addEventListener("change", function(){
+    if(!file.files.length) return;
+    var f = file.files[0];
+    if(!/image\/(png|jpeg)/.test(f.type)){ toast("Only JPG or PNG screenshots are accepted."); return; }
+    if(f.size > 5*1024*1024){ toast("File too large — screenshots must be under 5 MB."); return; }
+    document.getElementById(nameId).textContent = "Attached: "+f.name+" ("+Math.round(f.size/1024)+" KB) · demo — image not processed";
+  });
+}
+wireUpload("payUpload","payFile","payFileName");
+wireUpload("verUpload","verFile","verFileName");
+
+function analyseMessage(text){
+  var t = text.toLowerCase(), hits = [], score = 0;
+  function hit(label, why, pts){ hits.push({label:label, why:why}); score += pts; }
+  if(/(otp|one[- ]time password)/.test(t)) hit("Asks for an OTP", "Legitimate banks never ask you to share an OTP. Sharing it authorises a transaction.", 30);
+  if(/(upi pin|pin|password|cvv)/.test(t)) hit("Asks for a PIN / password / CVV", "Credentials are only ever entered by you inside your own bank/UPI app — never shared.", 30);
+  if(/(block|suspend|close|freeze|deactivat)/.test(t) && /(today|immediately|urgent|within \d+ (hour|hr)|24 hour)/.test(t)) hit("Threat + urgency", "“Act now or lose your account” pressure is the most common KYC-scam pattern.", 20);
+  if(/(kyc)/.test(t)) hit("KYC pretext", "KYC updates happen inside the bank branch or official app, not through message links.", 10);
+  var links = text.match(/https?:\/\/[^\s]+|www\.[^\s]+|[a-z0-9-]+\.(xyz|top|click|info|site|online|live)\b/gi);
+  if(links) hit("Suspicious link", "Link found: "+links[0]+" — look-alike or unofficial domains are a strong phishing signal. Official bank domains are the bank’s own .bank.in / .co.in / .com addresses.", 20);
+  if(/(won|prize|lottery|cashback|reward|congratulation)/.test(t)) hit("Prize / cashback lure", "Unexpected winnings that need a fee, PIN or “processing” step are a classic advance-fee fraud.", 20);
+  if(/(refund)/.test(t) && /(click|link|download|attach)/.test(t)) hit("Refund via link/attachment", "Refunds are credited automatically; they never need a link click or file download.", 15);
+  if(/(install|download).*(anydesk|teamviewer|app)/.test(t)) hit("Asks to install an app", "Screen-sharing apps give a stranger full control of your phone and banking apps.", 25);
+  if(/(customer care|helpline).{0,30}\d{10}/.test(t)) hit("Unofficial contact number", "Numbers inside messages are often fake “customer care” lines run by fraudsters.", 10);
+  var verdict = score >= 45 ? "High Risk" : score >= 18 ? "Suspicious Indicators" : (text.trim().length < 25 ? "Insufficient Evidence" : "Low Indicators");
+  return { score: Math.min(score,100), hits: hits, verdict: verdict, links: links };
+}
+document.getElementById("payAnalyse").addEventListener("click", function(){
+  var btn = this, text = document.getElementById("payText").value;
+  if(text.trim().length < 10){ toast("Paste a message of at least a few words to analyse."); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Analysing patterns…';
+  setTimeout(function(){
+    btn.disabled = false; btn.textContent = "Analyse message";
+    var r = analyseMessage(text);
+    var tagCls = r.verdict==="High Risk" ? "tag-high" : r.verdict==="Suspicious Indicators" ? "tag-susp" : r.verdict==="Insufficient Evidence" ? "tag-susp" : "tag-ok";
+    var steps = r.verdict==="High Risk"
+      ? ["Do not click any link or call any number in the message.","Do not share any OTP, PIN or password — if you already did, call 1930 and your bank immediately.","Check your account only inside the bank’s official app or at a branch.","Report the message at cybercrime.gov.in and block the sender."]
+      : r.verdict==="Suspicious Indicators"
+      ? ["Do not act on the message yet.","Verify the claim independently inside the official app or on the number printed on your debit card.","If it asks for credentials or payment, treat it as fraud and report it."]
+      : ["No strong scam pattern was detected, but that is not a guarantee of safety.","Still verify through official channels before acting or paying.","When in doubt, call your bank on the number from your card."];
+    document.getElementById("payResult").innerHTML =
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><span class="tag '+tagCls+'" style="font-size:12.5px;padding:5px 12px">'+r.verdict.toUpperCase()+'</span><span style="font-size:12.5px;color:var(--ink2)">Pattern score '+r.score+'/100 · Demo analyser — pattern matching only, not a guarantee</span></div>'
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:16px 0 6px">Extracted message</h4><p style="font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px">'+text.replace(/</g,"&lt;")+'</p>'
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px">Indicators found ('+r.hits.length+')</h4>'
+      + (r.hits.length ? r.hits.map(function(h){ return '<div class="list-item"><div class="grow"><div class="t">'+h.label+'</div><div class="d">'+h.why+'</div></div></div>'; }).join("") : '<p style="font-size:13px;color:var(--ink2)">No known scam patterns matched. Short or partial messages cannot be assessed reliably.</p>')
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px">Practical next steps</h4><ul style="margin:0;padding-left:17px;font-size:13px">'+steps.map(function(s){ return "<li>"+s+"</li>"; }).join("")+'</ul>'
+      + '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost btn-sm" id="payExport">Export this check (TXT)</button></div>';
+    document.getElementById("payExport").addEventListener("click", function(){ download("tipsahi-paysahi-check.txt", "TipSahi PaySahi — Demo Analysis\nVerdict: "+r.verdict+" (pattern score "+r.score+"/100)\nDate: "+fmtFull(dstr(TODAY))+"\n\nMessage:\n"+text+"\n\nIndicators:\n"+(r.hits.map(function(h){return "- "+h.label+": "+h.why;}).join("\n")||"None matched")+"\n\nNote: Pattern-based demo assessment only. Not a guarantee of safety or fraud.", "text/plain"); });
+    popIn(document.getElementById("payResult"));
+    payHistory.unshift({verdict:r.verdict, when:"Just now", preview:text.slice(0,64)+"…"});
+    renderPayHistory();
+    addActivity("Message check — "+text.slice(0,42)+"…", "PaySahi", r.verdict==="Low Indicators" ? "Suspicious Indicators" : r.verdict, null, "Pattern score "+r.score+"/100. "+r.hits.length+" indicator(s) found. Demo pattern analysis — not a guarantee.");
+    document.getElementById("payPaisa").innerHTML = paisaPause({
+      intro:"Before you act on any bank message, pause here: what do we actually know?",
+      evidence:["Pattern score "+r.score+"/100 from "+r.hits.length+" matched indicator(s)", r.hits.length ? r.hits.map(function(h){return h.label;}).join("; ") : "No known patterns matched"],
+      cashflow:["No payment has been made or blocked — PaySahi only assesses messages","If money was already sent, speed matters: call 1930 within the golden hour"],
+      missing:["Sender identity cannot be verified from message text alone","Whether the claim matches your real account status — only your bank can confirm"],
+      limits:["Pattern matching can miss new scam styles and can flag genuine messages","A “low indicators” result is never proof a message is genuine"],
+      steps:["Open your bank’s official app directly — not via the message","Compare any link’s domain with the bank’s official domain","Report fraud at cybercrime.gov.in or helpline 1930"]
+    });
+    toast("PaySahi analysis complete: "+r.verdict);
+  }, 700);
+});
+function renderPayHistory(){
+  document.getElementById("payHistory").innerHTML = payHistory.length ? payHistory.map(function(h){
+    return '<div class="list-item"><div class="grow"><div class="t">'+h.preview.replace(/</g,"&lt;")+'</div><div class="d">'+h.when+' · Demo session check</div></div>'+outcomeTag(h.verdict==="Low Indicators"?"Suspicious Indicators":h.verdict)+'</div>';
+  }).join("") : '<div class="empty">No checks run yet this session. Demo history samples appear in Activity History.</div>';
+}
+renderPayHistory();
+document.getElementById("paySample2").addEventListener("click", function(){ document.getElementById("payText").value = "Congratulations! You have WON Rs 25,000 cashback in UPI Lucky Draw. To claim, open http://upi-claim-prize.top and enter your UPI PIN within 2 hours. Hurry, offer expires today!"; });
+document.getElementById("payClear").addEventListener("click", function(){ document.getElementById("payText").value=""; document.getElementById("payResult").innerHTML='<div class="empty">No analysis yet. Paste a message and choose <b>Analyse message</b>.</div>'; document.getElementById("payPaisa").innerHTML=""; });
+
+/* ================= TipSahi Verify ================= */
+function analyseClaim(ticker, claim){
+  var c = claim.toLowerCase(), flags = [];
+  var guaranteed = /(guarantee|guaranteed|definitely|sure[- ]?shot|100%|no risk|risk[- ]free|double|multibagger|triple)/.test(c);
+  if(guaranteed) flags.push("Promises assured or outsized returns (“guaranteed / multibagger / double”) — SEBI bars intermediaries from assuring returns, and no equity return is guaranteed.");
+  if(/(insider|leaked|secret news|before the announcement|tip from)/.test(c)) flags.push("Claims insider or leaked information — trading on unpublished price-sensitive information is illegal under SEBI’s insider-trading regulations; such “tips” are also a common pump-and-dump pattern.");
+  if(/(buy now|hurry|last chance|don'?t miss)/.test(c)) flags.push("Urgency framing designed to prevent verification before acting.");
+  if(!/\d/.test(claim)) flags.push("The claim contains no figures, dates or periods that could be checked against a filing.");
+  var verdict, conf;
+  if(guaranteed){ verdict = "Contradicted"; conf = "The “assured return” element is contradicted by SEBI rules and by how equity markets work. The underlying company claim itself remains unverified."; }
+  else { verdict = "Insufficient Evidence"; conf = "This demo build has no live connection to BSE/NSE filings, so the factual core of the claim could not be checked. Verification is incomplete — that is not the same as the claim being false."; }
+  return {verdict:verdict, flags:flags, conf:conf};
+}
+document.getElementById("verAnalyse").addEventListener("click", function(){
+  var ticker = document.getElementById("verTicker").value.trim(), claim = document.getElementById("verClaim").value.trim();
+  var ok = true;
+  document.getElementById("verTickerErr").style.display = ticker ? "none":"block"; if(!ticker) ok=false;
+  document.getElementById("verClaimErr").style.display = claim ? "none":"block"; if(!claim) ok=false;
+  if(!ok) return;
+  var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Checking claim patterns…';
+  setTimeout(function(){
+    btn.disabled = false; btn.textContent = "Analyse claim";
+    var r = analyseClaim(ticker, claim);
+    document.getElementById("verResult").innerHTML =
+      '<div style="margin-top:10px"><span style="font-size:12px;color:var(--ink2)">IDENTIFIED COMPANY</span><br><b style="font-size:16px">'+ticker.replace(/</g,"&lt;").toUpperCase()+'</b></div>'
+      + '<div style="margin-top:10px"><span style="font-size:12px;color:var(--ink2)">EXTRACTED CLAIM</span><p style="font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px;margin-top:4px">'+claim.replace(/</g,"&lt;")+'</p></div>'
+      + '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+outcomeTag(r.verdict)+'<span class="tag tag-demo">VERIFICATION INCOMPLETE — NO LIVE FEED</span></div>'
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:16px 0 6px">What the evidence shows</h4>'
+      + (r.flags.length ? '<ul style="margin:0;padding-left:17px;font-size:13px">'+r.flags.map(function(f){ return "<li>"+f+"</li>"; }).join("")+'</ul>' : '<p style="font-size:13px;color:var(--ink2)">No manipulative-language patterns matched — but the factual claim itself still needs a filing to be supported.</p>')
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px">Check it yourself — official sources</h4>'
+      + '<div class="list-item"><div class="grow"><div class="t">BSE — company announcements</div><div class="d">Exchange filings &amp; disclosures · bseindia.com</div></div><a class="btn btn-ghost btn-sm" href="https://www.bseindia.com" target="_blank" rel="noopener">Open</a></div>'
+      + '<div class="list-item"><div class="grow"><div class="t">NSE — corporate announcements</div><div class="d">Exchange filings &amp; disclosures · nseindia.com</div></div><a class="btn btn-ghost btn-sm" href="https://www.nseindia.com" target="_blank" rel="noopener">Open</a></div>'
+      + '<div class="list-item"><div class="grow"><div class="t">SEBI — investor alerts</div><div class="d">Check whether the tipster is a SEBI-registered investment adviser · sebi.gov.in</div></div><a class="btn btn-ghost btn-sm" href="https://www.sebi.gov.in" target="_blank" rel="noopener">Open</a></div>'
+      + '<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:14px 0 6px">Confidence &amp; limitations</h4><p style="font-size:13px">'+r.conf+'</p>'
+      + '<p style="font-size:12.5px;color:var(--ink2)">Missing information: the original filing or disclosure, its publication date, and the tipster’s SEBI registration status were not provided. TipSahi never issues buy/sell recommendations.</p>'
+      + '<button class="btn btn-ghost btn-sm" id="verExport">Export this verdict (TXT)</button>';
+    document.getElementById("verExport").addEventListener("click", function(){ download("tipsahi-verify.txt", "TipSahi Verify — Demo Verdict\nCompany: "+ticker.toUpperCase()+"\nClaim: "+claim+"\nVerdict: "+r.verdict+"\n\nFindings:\n"+(r.flags.join("\n")||"No manipulative patterns matched.")+"\n\nLimitations: "+r.conf+"\nSources to check: BSE (bseindia.com), NSE (nseindia.com), SEBI (sebi.gov.in). No buy/sell recommendation is made.", "text/plain"); });
+    popIn(document.getElementById("verResult"));
+    addActivity("Claim check — "+ticker.toUpperCase(), "TipSahi Verify", r.verdict, null, r.conf);
+    document.getElementById("verHistory").innerHTML = '<div class="list-item"><div class="grow"><div class="t">'+ticker.replace(/</g,"&lt;").toUpperCase()+' — '+claim.slice(0,52).replace(/</g,"&lt;")+'…</div><div class="d">Just now · Demo session check · verification incomplete (no live feed)</div></div>'+outcomeTag(r.verdict)+'</div>' + document.getElementById("verHistory").innerHTML.replace('<div class="empty">No claims checked yet this session.</div>','');
+    document.getElementById("verPaisa").innerHTML = paisaPause({
+      intro:"A forwarded tip is asking for a decision. Pause and separate what is proven from what is promised.",
+      evidence:["Verdict: "+r.verdict, r.flags.length ? r.flags.length+" manipulative-language pattern(s) matched" : "No manipulative patterns matched"],
+      cashflow:["Acting on an unverified tip puts real capital at risk — size any decision against your PocketRunway reserve first"],
+      missing:["Original exchange filing and its publication date","Tipster’s SEBI registration (unregistered “tips” are a regulatory red flag)"],
+      limits:["Demo mode cannot fetch live filings — factual verification is incomplete","A claim with no red-flag language can still be false"],
+      steps:["Search the company on BSE/NSE announcement pages","Confirm the tipster on SEBI’s registered-intermediary list","Never pay for “guaranteed return” groups or tips"]
+    });
+    toast("Verdict recorded: "+r.verdict);
+  }, 700);
+});
+document.getElementById("verHistory").innerHTML = '<div class="empty">No claims checked yet this session.</div>';
+document.getElementById("verSample2").addEventListener("click", function(){
+  document.getElementById("verTicker").value = "Large-cap bank (name withheld in forward)";
+  document.getElementById("verClaim").value = "Forwarded: The bank’s quarterly profit grew strongly and management sounded confident on the earnings call. Stock looks good, accumulate on dips.";
+});
+
+/* ================= LoanLens ================= */
+function readLoanForm(){
+  return {
+    name: document.getElementById("loanName").value.trim() || "Untitled offer",
+    amt: parseFloat(document.getElementById("loanAmt").value),
+    rate: parseFloat(document.getElementById("loanRate").value),
+    months: parseInt(document.getElementById("loanTenure").value, 10),
+    down: Math.max(0, parseFloat(document.getElementById("loanDown").value) || 0),
+    feePct: parseFloat(document.getElementById("loanFeePct").value) || 0,
+    charges: parseFloat(document.getElementById("loanCharges").value) || 0,
+    start: document.getElementById("loanStart").value || dadd(14)
+  };
+}
+function validLoan(f){
+  var ok = true;
+  function mark(id, bad){ document.getElementById(id).style.display = bad ? "block":"none"; if(bad) ok=false; }
+  mark("e-loanAmt", !(f.amt >= 1000));
+  mark("e-loanRate", !(f.rate >= 0.1 && f.rate <= 40));
+  mark("e-loanTenure", !(f.months >= 1 && f.months <= 360));
+  return ok;
+}
+function renderLoanResult(f, c){
+  DB.currentLoan = {f:f, c:c};
+  document.getElementById("loanResult").innerHTML =
+    '<div class="stat-row" style="margin-top:8px"><span>Monthly EMI</span><b style="font-size:19px;color:var(--green-text)">'+inr(c.emi)+'</b></div>'
+    + '<div class="stat-row"><span>'+(f.down ? 'Principal financed (amount − down payment)' : 'Principal borrowed')+'</span><b>'+inr(Math.max(0, f.amt - (f.down||0)))+'</b></div>'
+    + '<div class="stat-row"><span>Total interest ('+f.months+' months @ '+f.rate+'%)</span><b>'+inr(c.totalInterest)+'</b></div>'
+    + '<div class="stat-row"><span>Fees &amp; charges</span><b>'+inr(c.fees)+'</b></div>'
+    + '<div class="stat-row"><span>Total scheduled repayment</span><b>'+inr(c.totalRepay)+'</b></div>'
+    + '<div class="stat-row"><span><b>Total borrowing cost (interest + fees)</b></span><b style="color:var(--red-text)">'+inr(c.totalInterest + c.fees)+'</b></div>'
+    + (f.down ? '<div class="stat-row"><span>Down payment (from your balance)</span><b>'+inr(f.down)+'</b></div>' : '')
+    + '<p style="font-size:12px;color:var(--ink2);margin:10px 0 0">EMI computed with the standard reducing-balance formula. Final month adjusted for rounding. This is an estimate — the lender’s sanction letter governs.</p>';
+  var finAmt = Math.max(0, f.amt - (f.down||0));
+  var tot = finAmt + c.totalInterest + c.fees;
+  var pP = Math.round(finAmt/tot*100), pI = Math.round(c.totalInterest/tot*100), pF = 100-pP-pI;
+  document.getElementById("loanBreakChart").innerHTML =
+    '<div style="display:flex;height:16px;border-radius:6px;overflow:hidden;transform-origin:left center;animation:barGrow .55s cubic-bezier(.22,.68,.32,1) both" role="img" aria-label="Breakdown: principal '+pP+' percent, interest '+pI+' percent, fees '+pF+' percent">'
+    + '<div style="width:'+pP+'%;background:var(--green)"></div><div style="width:'+pI+'%;background:var(--amber)"></div><div style="width:'+Math.max(pF,1)+'%;background:var(--red)"></div></div>'
+    + '<div class="legend"><span><i style="background:var(--green)"></i>Principal '+pP+'%</span><span><i style="background:var(--amber)"></i>Interest '+pI+'%</span><span><i style="background:var(--red)"></i>Fees '+pF+'%</span></div>';
+  document.getElementById("loanActions").hidden = false;
+  document.getElementById("amortBody").innerHTML = c.sched.slice(0,12).map(function(s){
+    return '<tr><td>'+s.m+'</td><td class="num">'+inr(s.emi)+'</td><td class="num">'+inr(s.principal)+'</td><td class="num">'+inr(s.interest)+'</td><td class="num">'+inr(s.balance)+'</td></tr>';
+  }).join("");
+  var simEnd = forecastSeries(30).end;
+  document.getElementById("loanPaisa").innerHTML = paisaPause({
+    intro:"The EMI is only the headline. Pause on the total cost and what it does to your month.",
+    evidence:["EMI "+inr(c.emi)+" × "+f.months+" months","Total interest "+inr(c.totalInterest)+" + fees "+inr(c.fees)+" = borrowing cost "+inr(c.totalInterest+c.fees)],
+    cashflow:["Adding this EMI takes your projected month-end from "+inr(simEnd)+" to roughly "+inr(simEnd - c.emi)+" in months where it falls due","PocketRunway reserve floor is "+inr(DB.reserve)+" — check the forecast after adding"],
+    missing:["Prepayment / foreclosure charges from the sanction letter","Whether the rate is fixed or floating after a teaser period"],
+    limits:["Estimate uses the stated rate for the full tenure; floating rates change real cost","Insurance bundled with loans is not included unless added to charges"],
+    steps:["Compare at least two offers on total cost, not EMI","Send the EMI to PocketRunway and re-check reserve warnings","Read foreclosure terms before signing"]
+  });
+  popIn(document.getElementById("loanResultCard"));
+}
+document.getElementById("loanForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var f = readLoanForm();
+  if(!validLoan(f)){ toast("Please fix the highlighted loan fields."); return; }
+  var c = loanCalc(Math.max(0, f.amt - f.down), f.rate, f.months, f.feePct, f.charges);
+  c.fees = Math.round(f.amt * f.feePct / 100) + f.charges; /* processing fee is % of the sanctioned loan amount, per the field label — not of the financed remainder */
+  c.totalCost = c.totalRepay + c.fees;
+  renderLoanResult(f, c);
+  addActivity(f.name+" — "+inr(f.amt)+" @ "+f.rate+"%", "LoanLens", "Calculated", f.amt, "EMI "+inr(c.emi)+" over "+f.months+" months. Total interest "+inr(c.totalInterest)+"; fees "+inr(c.fees)+"; total cost "+inr(c.totalCost + f.down)+(f.down ? " (incl. "+inr(f.down)+" down payment)" : "")+".");
+  toast("Loan calculated — EMI "+inr(c.emi)+"/month");
+});
+document.getElementById("loanAddCompare").addEventListener("click", function(){
+  var f = readLoanForm();
+  if(!validLoan(f)){ toast("Fix the loan fields before adding to comparison."); return; }
+  var c = loanCalc(Math.max(0, f.amt - f.down), f.rate, f.months, f.feePct, f.charges);
+  c.fees = Math.round(f.amt * f.feePct / 100) + f.charges;
+  c.totalCost = c.totalRepay + c.fees;
+  DB.compare.push({name:f.name, amt:f.amt, rate:f.rate, months:f.months, emi:c.emi, fees:c.fees, total:c.totalCost + f.down});
+  renderCompare();
+  toast("Added “"+f.name+"” to comparison");
+});
+function renderCompare(){
+  var body = document.getElementById("compareBody");
+  if(!DB.compare.length){ body.innerHTML = '<tr><td colspan="7"><div class="empty">No offers yet. The two demo offers below load automatically — add your own with “Add to comparison”.</div></td></tr>'; return; }
+  var best = Math.min.apply(null, DB.compare.map(function(o){ return o.total; }));
+  body.innerHTML = DB.compare.map(function(o, i){
+    return '<tr'+(o.total===best?' class="scenario-win" style="cursor:default"':' style="cursor:default"')+'><td data-l="Offer"><b>'+o.name+'</b>'+(o.total===best?' <span class="tag tag-ok">Lowest total cost</span>':"")+'<br><span style="color:var(--ink2);font-size:12px">'+o.months+' months</span></td><td data-l="Amount" class="num">'+inr(o.amt)+'</td><td data-l="Rate" class="num">'+o.rate+'%</td><td data-l="EMI" class="num">'+inr(o.emi)+'</td><td data-l="Fees" class="num">'+inr(o.fees)+'</td><td data-l="Total cost" class="num"><b>'+inr(o.total)+'</b></td><td><button class="btn btn-ghost btn-sm" data-del="'+i+'">Remove</button></td></tr>';
+  }).join("");
+  body.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click", function(){ DB.compare.splice(parseInt(b.dataset.del,10),1); renderCompare(); }); });
+}
+/* Seed comparison with the two demo offers from the shared dataset */
+(function(){
+  var a = loanCalc(500000, 11.5, 36, 1, 2500);
+  DB.compare.push({name:"Bank A — Personal Loan (demo)", amt:500000, rate:11.5, months:36, emi:a.emi, fees:a.fees, total:a.totalCost});
+  var b = loanCalc(300000, 16, 36, 2, 3000);
+  DB.compare.push({name:"NBFC Quick Loan (demo)", amt:300000, rate:16, months:36, emi:b.emi, fees:b.fees, total:b.totalCost});
+  renderCompare();
+})();
+document.getElementById("loanAmortToggle").addEventListener("click", function(){ var c = document.getElementById("amortCard"); c.hidden = !c.hidden; this.textContent = c.hidden ? "View amortisation schedule" : "Hide amortisation schedule"; });
+document.getElementById("loanExport").addEventListener("click", function(){
+  if(!DB.currentLoan) return;
+  var csv = "Month,EMI,Principal,Interest,Balance\n" + DB.currentLoan.c.sched.map(function(s){ return [s.m,s.emi,s.principal,s.interest,s.balance].join(","); }).join("\n");
+  download("tipsahi-amortisation.csv", csv, "text/csv");
+});
+document.getElementById("loanToPocket").addEventListener("click", function(){
+  if(!DB.currentLoan) return;
+  var f = DB.currentLoan.f, c = DB.currentLoan.c;
+  document.getElementById("loanModalText").innerHTML = "Add <b>"+inr(c.emi)+"/month</b> for <b>"+f.name+"</b> ("+f.months+" EMIs from "+fmtFull(f.start)+") to PocketRunway as a recurring commitment?";
+  openModal("loanModal");
+});
+document.getElementById("loanCancel").addEventListener("click", function(){ closeModal("loanModal"); });
+document.getElementById("loanConfirm").addEventListener("click", function(){
+  closeModal("loanModal");
+  if(!DB.currentLoan) return;
+  var f = DB.currentLoan.f, c = DB.currentLoan.c;
+  var firstDate = f.start < dstr(TODAY) ? dadd(3) : f.start;
+  DB.txns.push({id:DB.nextTxnId++, name:"EMI — "+f.name, date:firstDate, type:"emi", amt:c.emi, cert:"certain", src:"From LoanLens"});
+  DB.loanInPocket = true;
+  renderPocket();
+  renderOverview();
+  toast("EMI added to PocketRunway — forecast recalculated.");
+  go("pocketrunway");
+  document.getElementById("loanBanner").innerHTML = '<div class="notice notice-green"><b>Loan applied:</b> '+f.name+' EMI of '+inr(c.emi)+' is now in your forecast (first due '+fmtFull(firstDate)+'). Remove it from the table below if you decide not to proceed.</div>';
+});
+
+/* ================= PocketRunway ================= */
+var pocketPrev = {}; /* last shown PocketRunway KPI numbers — count-up only when a value changes */
+function renderPocket(){
+  DB.balance = parseFloat(document.getElementById("pkBalance").value) || DB.balance;
+  DB.reserve = parseFloat(document.getElementById("pkReserve").value) || 0;
+  var f = forecastSeries(30), t = txnTotals();
+  var daysBelow = f.series.filter(function(p){ return p.bal < DB.reserve; }).length;
+  var kpis = [
+    {l:"Available Balance", v:inr(DB.balance), num:DB.balance, n:"Starting point · today"},
+    {l:"Projected Month-End", v:inr(f.end), num:f.end, n:"After all scheduled items"},
+    {l:"Lowest Projected Balance", v:inr(f.lowest), num:f.lowest, n:"On "+fmtFull(f.lowestDate), cls: f.lowest < DB.reserve ? "bad":""},
+    {l:"Reserve Status", v: daysBelow ? daysBelow+" day(s) below floor" : "Protected", n:"Floor "+inr(DB.reserve), cls: daysBelow ? "warn":""}
+  ];
+  document.getElementById("pocketKpis").innerHTML = kpis.map(function(k, i){ return '<div class="card kpi"><div class="k-label">'+k.l+'</div><div class="k-value" style="font-size:21px" data-pkval="'+i+'">'+k.v+'</div><div class="k-note '+(k.cls||"")+'">'+k.n+'</div></div>'; }).join("");
+  kpis.forEach(function(k, i){
+    if(k.num == null) return;
+    var prev = pocketPrev[i];
+    pocketPrev[i] = k.num;
+    if(prev !== undefined && prev !== k.num) countUp(document.querySelector('#pocketKpis [data-pkval="'+i+'"]'), prev, k.num, true);
+  });
+  lineChart(document.getElementById("pocketChart"), document.getElementById("pocketTip"), f.series, DB.reserve, "Line chart of projected daily balance for the next 30 days");
+  document.getElementById("pkInc").textContent = inr(t.inc);
+  document.getElementById("pkOut").textContent = inr(t.out);
+  document.getElementById("pkUnc").textContent = inr(t.unc) + " (labelled uncertain)";
+  var warn = "";
+  if(f.lowest < 0) warn += '<div class="notice notice-red" style="margin:0 0 8px"><b>Shortfall risk:</b> projected balance goes negative ('+inr(f.lowest)+' on '+fmtFull(f.lowestDate)+'). Move a payment date, reduce an expense, or add income before committing to anything new.</div>';
+  else if(daysBelow) warn += '<div class="notice notice-amber" style="margin:0 0 8px"><b>Reserve warning:</b> '+daysBelow+' day(s) dip below your '+inr(DB.reserve)+' reserve, lowest '+inr(f.lowest)+' on '+fmtFull(f.lowestDate)+'. The uncertain festival expense is a lever you control.</div>';
+  else warn = '<div class="notice notice-green" style="margin:0">No shortfall projected: the balance stays above your '+inr(DB.reserve)+' reserve for the next 30 days on current entries.</div>';
+  if(t.unc > 0) warn += '<p style="font-size:12px;color:var(--ink2);margin:8px 0 0">Uncertain items included above: '+inr(t.unc)+' of expected income and any entries marked “uncertain”. If uncertain income slips, re-run the forecast without it.</p>';
+  document.getElementById("pocketWarnings").innerHTML = warn;
+  var sorted = DB.txns.slice().sort(function(a,b){ return a.date<b.date?-1:1; });
+  document.getElementById("txnBody").innerHTML = sorted.map(function(x){
+    return '<tr style="cursor:default"><td data-l="Item"><b>'+x.name+'</b><br><span style="font-size:11.5px;color:var(--ink2)">'+x.src+'</span></td><td data-l="Date">'+fmtFull(x.date)+'</td><td data-l="Type">'+(x.type==="income"?"Income":x.type==="emi"?"EMI":"Expense")+'</td><td data-l="Certainty">'+(x.cert==="uncertain"?'<span class="tag tag-susp">Uncertain</span>':'Certain')+'</td><td data-l="Amount" class="num" style="color:'+(x.type==="income"?"var(--green-text)":"inherit")+';font-weight:600">'+(x.type==="income"?"+":"−")+inr(x.amt).slice(0)+'</td><td><button class="btn btn-ghost btn-sm" data-edit="'+x.id+'">Edit</button></td></tr>';
+  }).join("");
+  document.querySelectorAll("[data-edit]").forEach(function(b){ b.addEventListener("click", function(){ openTxn(parseInt(b.dataset.edit,10)); }); });
+  document.getElementById("invBaseBal").textContent = inr(DB.balance);
+  document.getElementById("invBaseEnd").textContent = inr(f.end);
+}
+var editingTxn = null;
+function openTxn(id){
+  editingTxn = id || null;
+  var x = id ? DB.txns.filter(function(t){ return t.id===id; })[0] : null;
+  document.getElementById("txnModalTitle").textContent = x ? "Edit transaction" : "Add transaction";
+  document.getElementById("txName").value = x ? x.name : "";
+  document.getElementById("txDate").value = x ? x.date : dadd(5);
+  document.getElementById("txAmt").value = x ? x.amt : "";
+  document.getElementById("txType").value = x ? x.type : "expense";
+  document.getElementById("txCert").value = x ? x.cert : "certain";
+  document.getElementById("txnDelete").hidden = !x;
+  openModal("txnModal");
+}
+document.getElementById("txnAddBtn").addEventListener("click", function(){ openTxn(null); });
+document.getElementById("txnCancel").addEventListener("click", function(){ closeModal("txnModal"); });
+document.getElementById("txnDelete").addEventListener("click", function(){
+  DB.txns = DB.txns.filter(function(t){ return t.id !== editingTxn; });
+  closeModal("txnModal"); renderPocket(); renderOverview(); toast("Transaction deleted — forecast recalculated.");
+});
+document.getElementById("txnForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var data = { name: document.getElementById("txName").value.trim(), date: document.getElementById("txDate").value, amt: parseFloat(document.getElementById("txAmt").value), type: document.getElementById("txType").value, cert: document.getElementById("txCert").value };
+  if(!data.name || !data.date || !(data.amt > 0)){ toast("Fill description, date and a positive amount."); return; }
+  if(editingTxn){ var x = DB.txns.filter(function(t){ return t.id===editingTxn; })[0]; Object.assign(x, data); }
+  else DB.txns.push(Object.assign({id:DB.nextTxnId++, src:"Added by you"}, data));
+  closeModal("txnModal"); renderPocket(); renderOverview(); toast("Saved — forecast, overview and InvestLab baseline updated.");
+});
+document.getElementById("pkApply").addEventListener("click", function(){ renderPocket(); renderOverview(); toast("Forecast recalculated from updated balance & reserve."); });
+
+/* ================= InvestLab ================= */
+function runInvest(record){
+  var price = parseFloat(document.getElementById("invPrice").value) || 0;
+  var months = Math.max(1, parseInt(document.getElementById("invSaveMonths").value,10) || 6);
+  var monthly = parseFloat(document.getElementById("invMonthlySave").value) || 0;
+  var lrate = parseFloat(document.getElementById("invLoanRate").value) || 0;
+  var ret = parseFloat(document.getElementById("invReturn").value) || 0;
+  var surplus = parseFloat(document.getElementById("invSurplus").value) || 0;
+  var loan = loanCalc(price, lrate, months, 1, 0);
+  var baseEnd = forecastSeries(30).end;
+  var aEnd = DB.balance - 0; // buy now on loan: cash preserved, EMI obligation added
+  var aLowest = baseEnd - loan.emi;
+  var bSaved = monthly * months;
+  var bEnd = DB.balance; // saving keeps balance, purchase later from savings
+  var upVal = Math.round(surplus * Math.pow(1 + ret/100, months/12));
+  var downVal = Math.round(surplus * Math.pow(1 - 0.08, months/12));
+  function card(title, tag, rows, note){
+    return '<div class="card"><h3>'+title+' '+tag+'</h3>'+rows.map(function(r){ return '<div class="stat-row"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'; }).join("")+'<p style="font-size:12.5px;color:var(--ink2);margin-top:10px">'+note+'</p></div>';
+  }
+  document.getElementById("invResults").innerHTML =
+    card("Scenario A — Buy now on a loan", '<span class="tag tag-info">SIMULATED</span>', [
+      ["Starting cash position", inr(DB.balance)],
+      ["Purchase price", inr(price)],
+      ["Loan EMI × "+months+" months", inr(loan.emi)+"/mo"],
+      ["Total interest + 1% fee", inr(loan.totalInterest + loan.fees)],
+      ["Projected cash after first EMI month", inr(aLowest)],
+      ["Reserve floor check", aLowest >= DB.reserve ? "Stays above "+inr(DB.reserve) : "Dips below "+inr(DB.reserve)+" — caution"]
+    ], "You get the item today, but the EMI is a fixed obligation in PocketRunway for "+months+" months, whatever happens to income.")
+    + card("Scenario B — Save first, buy later", '<span class="tag tag-info">SIMULATED</span>', [
+      ["Starting cash position", inr(DB.balance)],
+      ["Monthly saving", inr(monthly)],
+      ["Saved in "+months+" months", inr(bSaved)],
+      ["Shortfall vs price", bSaved >= price ? "None — fully covered" : inr(price - bSaved)+" still needed"],
+      ["Interest paid", inr(0)],
+      ["Reserve floor check", "Reserve untouched while saving"]
+    ], "No interest cost and no new obligation — but you wait "+months+" months, and the price or your need may change meanwhile.");
+  document.getElementById("invResults").insertAdjacentHTML("beforeend",
+    '<div class="card" style="grid-column:1/-1"><h3>Hypothetical surplus simulation <span class="tag tag-demo">NOT A PREDICTION</span></h3>'
+    + '<div class="stat-row" style="margin-top:8px"><span>Surplus simulated</span><b>'+inr(surplus)+'</b></div>'
+    + '<div class="stat-row"><span>At assumed +'+ret+'% p.a. for '+months+' months</span><b style="color:var(--green-text)">'+inr(upVal)+' ('+(upVal>=surplus?"+":"")+inr(upVal-surplus)+')</b></div>'
+    + '<div class="stat-row"><span>Downside case at −8% p.a.</span><b style="color:var(--red-text)">'+inr(downVal)+' ('+inr(downVal-surplus)+')</b></div>'
+    + '<p style="font-size:12.5px;color:var(--ink2);margin-top:10px">These are arithmetic illustrations using your assumed rates — not historical data, not a forecast, and not a recommendation. Real returns vary and capital is at risk.</p></div>');
+  popIn(document.getElementById("invResults"));
+  if(record){
+    DB.scenariosCompared++;
+    addActivity("Scenario: buy now vs save first — "+inr(price), "InvestLab", "Simulated", price, "Hypothetical comparison on PocketRunway baseline. Loan route interest "+inr(loan.totalInterest+loan.fees)+"; saving route reaches "+inr(bSaved)+" in "+months+" months. Simulation only.");
+  }
+  document.getElementById("invPaisa").innerHTML = paisaPause({
+    intro:"Both routes reach the same purchase. The difference is risk shape, not just rupees.",
+    evidence:["Buy-now total extra cost: "+inr(loan.totalInterest + loan.fees)+" in interest & fees","Save-first total extra cost: "+inr(0)+" interest, "+months+" months of waiting"],
+    cashflow:["Buy now adds a fixed "+inr(loan.emi)+"/month obligation to PocketRunway","Save first keeps every existing commitment unchanged"],
+    missing:["Whether the price will change during the saving period","Income stability over the next "+months+" months"],
+    limits:["Investment figures use your assumed rates — real outcomes differ, including losses","Simulation ignores tax and product-specific charges"],
+    steps:["Run the buy-now EMI through LoanLens for exact figures","Check the PocketRunway reserve warning with the EMI added","Decide only after the reserve stays protected in both routes"]
+  });
+  if(record) toast("Scenarios recalculated from your PocketRunway baseline.");
+}
+document.getElementById("invRun").addEventListener("click", function(){ runInvest(true); });
+
+/* ================= History ================= */
+var histPage = 0, HIST_PER = 8;
+function renderHistory(){
+  var q = document.getElementById("histSearch").value, mod = document.getElementById("histModule").value, out = document.getElementById("histOutcome").value, sort = document.getElementById("histSort").value;
+  var rows = filteredActivity(q, mod, sort).filter(function(a){ return !out || a.outcome === out || (out==="Suspicious Indicators" && a.outcome==="Suspicious Indicators"); });
+  var pages = Math.max(1, Math.ceil(rows.length/HIST_PER));
+  histPage = Math.min(histPage, pages-1);
+  var slice = rows.slice(histPage*HIST_PER, histPage*HIST_PER+HIST_PER);
+  document.getElementById("histBody").innerHTML = slice.length ? slice.map(function(a){
+    return '<tr data-id="'+a.id+'"><td data-l="Analysis"><b>'+a.title+'</b></td><td data-l="Module">'+a.module+'</td><td data-l="Date">'+fmtFull(a.date)+'</td><td data-l="Outcome">'+outcomeTag(a.outcome)+'</td><td data-l="Amount" class="num">'+(a.amt?inr(a.amt):"—")+'</td><td data-l="Source">'+a.src+'</td></tr>';
+  }).join("") : '<tr><td colspan="6"><div class="empty">No records match. Clear a filter or run a new analysis.</div></td></tr>';
+  document.getElementById("histPageInfo").textContent = "Page "+(histPage+1)+" of "+pages+" · "+rows.length+" records";
+  document.getElementById("histPrev").disabled = histPage===0;
+  document.getElementById("histNext").disabled = histPage>=pages-1;
+  bindRowClicks(document.getElementById("histBody"));
+}
+["histSearch","histModule","histOutcome","histSort"].forEach(function(id){ document.getElementById(id).addEventListener("input", function(){ histPage=0; renderHistory(); }); });
+document.getElementById("histPrev").addEventListener("click", function(){ if(histPage>0){ histPage--; renderHistory(); } });
+document.getElementById("histNext").addEventListener("click", function(){ histPage++; renderHistory(); });
+
+/* ================= Downloads & Reports ================= */
+function download(name, content, type){
+  var blob = new Blob([content], {type: type || "text/plain"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+document.getElementById("histCsv").addEventListener("click", function(){
+  var csv = "Title,Module,Date,Outcome,Amount (INR),Source\n" + DB.activity.map(function(a){ return '"'+a.title.replace(/"/g,'""')+'",'+a.module+","+a.date+","+a.outcome+","+(a.amt||"")+",\""+a.src+"\""; }).join("\n");
+  download("tipsahi-activity-history.csv", csv, "text/csv");
+  toast("History exported as CSV");
+});
+var REPORTS = [
+  {id:"r1", title:"PaisaPause Monthly Summary — October 2026", kind:"Summary", demo:true, body:function(){
+    var f = forecastSeries(30);
+    return "TipSahi — PaisaPause Monthly Summary (DEMO)\nGenerated: "+fmtFull(dstr(TODAY))+"\n\nAvailable balance: "+inr(DB.balance)+"\nProjected month-end: "+inr(f.end)+"\nLowest projected balance: "+inr(f.lowest)+" on "+fmtFull(f.lowestDate)+"\nReserve floor: "+inr(DB.reserve)+"\nChecks completed: "+DB.activity.length+"\nHigh-risk items: "+DB.activity.filter(function(a){return a.outcome==="High Risk";}).length+"\nScenarios compared: "+DB.scenariosCompared+"\n\nThis summary consolidates demo data across PaySahi, TipSahi Verify, LoanLens, PocketRunway and InvestLab. It is not financial advice.";
+  }},
+  {id:"r2", title:"Loan Comparison Report — Personal Loan Offers", kind:"LoanLens", demo:true, body:function(){
+    return "TipSahi — Loan Comparison (DEMO)\nGenerated: "+fmtFull(dstr(TODAY))+"\n\n"+DB.compare.map(function(o){ return o.name+": "+inr(o.amt)+" @ "+o.rate+"% x "+o.months+"mo | EMI "+inr(o.emi)+" | Fees "+inr(o.fees)+" | Total cost "+inr(o.total); }).join("\n")+"\n\nCompare on total cost, not EMI alone. Estimates only; lender sanction letters govern.";
+  }},
+  {id:"r3", title:"Scam-Check Log — PaySahi", kind:"PaySahi", demo:true, body:function(){
+    var rows = DB.activity.filter(function(a){ return a.module==="PaySahi"; });
+    return "TipSahi — PaySahi Scam-Check Log (DEMO)\nGenerated: "+fmtFull(dstr(TODAY))+"\n\n"+rows.map(function(a){ return fmtFull(a.date)+" — "+a.title+" ["+a.outcome+"]\n  "+a.detail; }).join("\n")+"\n\nPattern-based assessments only; not a guarantee. Report fraud: cybercrime.gov.in / 1930.";
+  }},
+  {id:"r4", title:"Claim Verification Log — TipSahi Verify", kind:"Verify", demo:true, body:function(){
+    var rows = DB.activity.filter(function(a){ return a.module==="TipSahi Verify"; });
+    return "TipSahi — Verification Log (DEMO — verification incomplete, no live feed)\nGenerated: "+fmtFull(dstr(TODAY))+"\n\n"+rows.map(function(a){ return fmtFull(a.date)+" — "+a.title+" ["+a.outcome+"]\n  "+a.detail; }).join("\n")+"\n\nCheck primary sources: BSE bseindia.com, NSE nseindia.com, SEBI sebi.gov.in. No buy/sell recommendations.";
+  }}
+];
+function renderReports(){
+  document.getElementById("reportGrid").innerHTML = REPORTS.map(function(r){
+    return '<div class="card"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="tag tag-info">'+r.kind+'</span>'+(r.demo?'<span class="tag tag-demo">SAMPLE REPORT</span>':"")+'</div><h3 style="margin-top:10px">'+r.title+'</h3><p class="sub">Generated from the shared workspace data · '+fmtFull(dstr(TODAY))+'</p><div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" data-report="'+r.id+'">Download report (TXT)</button><button class="btn btn-ghost btn-sm" data-preview="'+r.id+'">Preview</button></div></div>';
+  }).join("");
+  document.querySelectorAll("[data-report]").forEach(function(b){ b.addEventListener("click", function(){
+    var r = REPORTS.filter(function(x){ return x.id===b.dataset.report; })[0];
+    download("tipsahi-"+r.id+"-report.txt", r.body(), "text/plain"); toast("Report downloaded");
+  }); });
+  document.querySelectorAll("[data-preview]").forEach(function(b){ b.addEventListener("click", function(){
+    var r = REPORTS.filter(function(x){ return x.id===b.dataset.preview; })[0];
+    document.getElementById("detailTitle").textContent = r.title;
+    document.getElementById("detailBody").innerHTML = '<pre style="white-space:pre-wrap;font:inherit;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px">'+r.body().replace(/</g,"&lt;")+'</pre>';
+    document.getElementById("detailOpen").style.display = "none"; /* report previews have no tool to open — don't show a dead action */
+    openModal("detailModal");
+  }); });
+}
+
+/* ================= Settings ================= */
+document.getElementById("setSave").addEventListener("click", function(){
+  var name = document.getElementById("setName").value.trim() || "Demo User";
+  document.getElementById("profileBtn").textContent = name.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
+  var m = document.getElementById("setRange").value.match(/(\d+)/);
+  if(m){ dashRange = {mode:"preset", days:parseInt(m[1],10)}; syncRangeUI(); }
+  toast("Preferences saved for this session · Currency "+document.getElementById("setCurrency").value+" · "+document.getElementById("setLang").value+" · Overview range: "+document.getElementById("setRange").value);
+});
+["ntRisk","ntEmi","ntReserve","ntDigest","pvRetain","pvAuto"].forEach(function(id){
+  document.getElementById(id).addEventListener("change", function(){ toast("Setting updated for this session."); });
+});
+document.getElementById("pvExport").addEventListener("click", function(){
+  download("tipsahi-my-data.json", JSON.stringify({exported: dstr(TODAY), balance: DB.balance, reserve: DB.reserve, transactions: DB.txns, activity: DB.activity}, null, 2), "application/json");
+  toast("Session data downloaded as JSON");
+});
+document.getElementById("pvDelete").addEventListener("click", function(){
+  if(document.getElementById("pvDelete").dataset.armed){
+    DB.activity = DB.activity.filter(function(a){ return a.src === "Demo"; });
+    payHistory = []; renderPayHistory(); renderOverview(); renderHistory();
+    document.getElementById("pvDelete").textContent = "Delete session data"; delete document.getElementById("pvDelete").dataset.armed;
+    toast("Your session analyses were deleted. Demo records remain.");
+  } else {
+    document.getElementById("pvDelete").dataset.armed = "1";
+    document.getElementById("pvDelete").textContent = "Tap again to confirm deletion";
+    setTimeout(function(){ var b=document.getElementById("pvDelete"); delete b.dataset.armed; b.textContent="Delete session data"; }, 4000);
+  }
+});
+
+/* ================= PaisaPause defaults for PocketRunway ================= */
+function renderPocketPaisa(){
+  var f = forecastSeries(30), t = txnTotals();
+  document.getElementById("pocketPaisa").innerHTML = paisaPause({
+    intro:"Your forecast in one pause: what is certain, what is guessed, and where the floor is.",
+    evidence:["Expected income "+inr(t.inc)+" vs outgo "+inr(t.out)+" in the next 30 days","Lowest projected balance "+inr(f.lowest)+" on "+fmtFull(f.lowestDate)],
+    cashflow:["Month-end projection "+inr(f.end)+" from a starting "+inr(DB.balance), DB.txns.filter(function(x){return x.type==="emi";}).length+" EMI commitment(s) included"],
+    missing:["Irregular expenses (repairs, medical, travel) are not in the entries yet"],
+    limits:["Uncertain income of "+inr(t.unc)+" is included at face value — treat the projection as optimistic by that amount","Forecast assumes every entry happens on its stated date"],
+    steps:["Add any bill you already know about before judging the forecast","Keep the reserve floor at one month of essential outgo or higher","Re-check after any LoanLens EMI is added"]
+  });
+}
+
+/* ================= Boot ================= */
+document.getElementById("page-overview").classList.add("fresh");
+setTimeout(function(){ document.getElementById("page-overview").classList.remove("fresh"); }, 1000);
+renderOverview();
+renderPocket();
+renderPocketPaisa();
+runInvest(false);
+</script>
+</body>
+</html>
